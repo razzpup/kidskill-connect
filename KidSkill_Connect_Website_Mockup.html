@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KidSkill Connect — Preview Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#2B2E86;
+    --navy-dark:#1E2160;
+    --coral:#FF6F59;
+    --coral-dark:#E85A45;
+    --yellow:#FFC857;
+    --yellow-dark:#F0AE2E;
+    --paper:#FFF9F2;
+    --ink:#252654;
+    --muted:#6B6E9B;
+    --card:#FFFFFF;
+    --coral-tint:#FFE8E3;
+    --yellow-tint:#FFF3D6;
+    --navy-tint:#E7E8F7;
+    --green:#1E8A5F;
+    --green-tint:#DDF3E8;
+    --red:#C7402F;
+    --red-tint:#FBE4E1;
+    --radius:20px;
+    --radius-sm:12px;
+    --shadow:0 10px 30px rgba(43,46,134,0.10);
+    --shadow-sm:0 4px 14px rgba(43,46,134,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Inter",-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:"Baloo 2",sans-serif; margin:0; letter-spacing:-0.01em;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1140px; margin:0 auto; padding:0 24px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:600;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--coral-dark);
+  }
+  button{font-family:inherit;}
+
+  /* ---------- Sticker badge (signature element) ---------- */
+  .sticker{
+    position:relative;
+    box-shadow: var(--shadow-sm);
+  }
+  .sticker::after{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:inherit;
+    border:2px dashed rgba(43,46,134,0.14);
+    pointer-events:none;
+  }
+
+  /* ---------- Header ---------- */
+  header.site-header{
+    background:var(--navy); color:#fff; position:sticky; top:0; z-index:50;
+    box-shadow:0 2px 16px rgba(30,33,96,0.18);
+  }
+  .header-inner{ display:flex; align-items:center; justify-content:space-between; padding:14px 0; gap:14px; flex-wrap:wrap; }
+  .logo{ font-family:"Baloo 2",sans-serif; font-weight:800; font-size:22px; color:#fff; display:flex; align-items:center; gap:9px; }
+  .logo .balloon{ font-size:24px; transform:rotate(-8deg); display:inline-block; }
+  .logo .dot{ color:var(--yellow); }
+  nav.main-nav{ display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  nav.main-nav button.navlink{
+    background:none; border:none; cursor:pointer;
+    font-size:14.5px; font-weight:600; color:#D9DAF3; padding:6px 4px;
+  }
+  nav.main-nav button.navlink:hover{ color:#fff; }
+  nav.main-nav button.navlink.active{ color:var(--yellow); }
+  .nav-cta{ background:var(--coral); color:#fff!important; padding:10px 20px; border-radius:999px; font-weight:700; border:none; cursor:pointer; font-size:14px; }
+  .nav-cta:hover{ background:var(--coral-dark); }
+  .role-switcher{ display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.08); padding:5px; border-radius:999px; }
+  .role-switcher button{
+    background:none; border:none; color:#C9CBEF; font-size:12.5px; font-weight:700;
+    padding:6px 12px; border-radius:999px; cursor:pointer;
+  }
+  .role-switcher button.active{ background:var(--yellow); color:var(--navy-dark); }
+
+  /* ---------- Buttons ---------- */
+  .btn{ display:inline-flex; align-items:center; gap:6px; padding:13px 26px; border-radius:999px; font-weight:700; font-size:15px; cursor:pointer; border:none; text-align:center; font-family:inherit; }
+  .btn-primary{ background:var(--coral); color:#fff; }
+  .btn-primary:hover{ background:var(--coral-dark); }
+  .btn-secondary{ background:var(--navy); color:#fff; }
+  .btn-secondary:hover{ background:var(--navy-dark); }
+  .btn-outline{ background:#fff; color:var(--navy); border:2px solid var(--navy); }
+  .btn-outline:hover{ background:var(--navy-tint); }
+  .btn-ghost{ background:transparent; color:var(--navy); font-weight:700; padding:8px; }
+  .btn-sm{ padding:9px 18px; font-size:13.5px; }
+  .btn-block{ width:100%; justify-content:center; }
+
+  /* ---------- Hero ---------- */
+  .hero{ background:linear-gradient(180deg,var(--navy) 0%, var(--navy-dark) 100%); color:#fff; padding:72px 0 64px; position:relative; overflow:hidden; }
+  .hero::before{ content:""; position:absolute; top:-90px; right:-90px; width:320px; height:320px; border-radius:50%; background:var(--navy-dark); opacity:0.7; }
+  .hero::after{ content:""; position:absolute; bottom:-120px; left:-60px; width:260px; height:260px; border-radius:50%; background:rgba(255,200,87,0.06); }
+  .hero-inner{ position:relative; z-index:2; display:grid; grid-template-columns:1.15fr 0.85fr; gap:40px; align-items:center; }
+  .hero h1{ font-size:44px; line-height:1.12; max-width:560px; }
+  .hero h1 .hl{ color:var(--yellow); }
+  .hero p.lead{ font-size:16.5px; color:#C9CBEF; max-width:480px; margin:18px 0 28px; line-height:1.55; }
+  .hero .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .hero-stickers{ position:relative; height:320px; }
+  .float-badge{
+    position:absolute; background:#fff; border-radius:18px; padding:14px 16px;
+    box-shadow:var(--shadow); display:flex; align-items:center; gap:10px; color:var(--ink);
+  }
+  .float-badge .emoji{ font-size:26px; }
+  .float-badge .lbl{ font-weight:700; font-size:13.5px; }
+  .float-badge .sub{ font-size:11px; color:var(--muted); }
+
+  /* ---------- Sections ---------- */
+  .section{ padding:56px 0; }
+  .section-title{ font-size:28px; margin-bottom:6px; }
+  .section-sub{ color:var(--muted); font-size:14.5px; margin-bottom:30px; }
+
+  /* ---------- Category grid (signature sticker badges) ---------- */
+  .category-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:18px; }
+  .category-card{
+    background:var(--card); border-radius:var(--radius); padding:26px 12px; text-align:center;
+    transition:transform .15s ease, box-shadow .15s ease; cursor:pointer; border:none;
+  }
+  .category-card:nth-child(odd){ transform:rotate(-1.4deg); }
+  .category-card:nth-child(even){ transform:rotate(1.4deg); }
+  .category-card:hover{ transform:scale(1.05) rotate(0deg); box-shadow:var(--shadow); }
+  .category-emoji{ font-size:36px; margin-bottom:8px; }
+  .category-name{ font-weight:700; font-size:14.5px; font-family:"Baloo 2",sans-serif; }
+
+  /* ---------- Provider cards ---------- */
+  .provider-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(258px,1fr)); gap:20px; }
+  .provider-card{
+    background:var(--card); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow-sm);
+    display:flex; flex-direction:column; gap:6px; cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+    border:1.5px solid transparent;
+  }
+  .provider-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--coral-tint); }
+  .provider-avatar{
+    width:54px; height:54px; border-radius:50%; background:var(--navy); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;
+    margin-bottom:8px; font-family:"Baloo 2",sans-serif;
+  }
+  .badge{ display:inline-block; padding:4px 12px; border-radius:999px; font-size:11.5px; font-weight:700; letter-spacing:0.02em; width:fit-content; }
+  .badge-coral{ background:var(--coral-tint); color:var(--coral-dark); }
+  .badge-navy{ background:var(--navy-tint); color:var(--navy); }
+  .badge-yellow{ background:var(--yellow-tint); color:#8A6112; }
+  .badge-green{ background:var(--green-tint); color:var(--green); }
+  .badge-red{ background:var(--red-tint); color:var(--red); }
+  .provider-name{ font-size:17.5px; font-weight:700; font-family:"Baloo 2",sans-serif; }
+  .provider-headline{ font-size:13.5px; color:var(--muted); }
+  .provider-meta{ font-size:12.5px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; margin:4px 0; }
+  .provider-price{ font-weight:800; color:var(--ink); margin-top:6px; font-size:15px; }
+  .rating-stars{ color:var(--yellow-dark); font-weight:700; font-size:13.5px; }
+
+  /* ---------- Filters ---------- */
+  .filter-bar{ background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-sm); display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:30px; align-items:end; }
+  .filter-bar label{ font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.03em; }
+  select,input,textarea{
+    width:100%; padding:11px 13px; border:1.5px solid #E2E1F2; border-radius:var(--radius-sm);
+    font-size:14.5px; font-family:inherit; background:#fff; color:var(--ink);
+  }
+  select:focus,input:focus,textarea:focus{ outline:none; border-color:var(--coral); }
+
+  /* ---------- Cards / misc ---------- */
+  .card{ background:var(--card); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow-sm); }
+  .card + .card{ margin-top:16px; }
+  .two-col{ display:grid; grid-template-columns:1.6fr 1fr; gap:26px; align-items:start; }
+  .stat-box{ background:var(--navy-tint); border-radius:var(--radius-sm); padding:18px; text-align:center; }
+  .stat-num{ font-size:27px; font-weight:800; color:var(--navy); font-family:"Baloo 2",sans-serif; }
+  .stat-label{ font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.03em; margin-top:2px; }
+  .hint{ font-size:12.5px; color:var(--muted); }
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th,td{ text-align:left; padding:11px 8px; border-bottom:1px solid #EEE; }
+  th{ font-size:11px; text-transform:uppercase; color:var(--muted); letter-spacing:0.03em; }
+  .review-item{ border-bottom:1px solid #EEE; padding:15px 0; }
+  .review-item:last-child{ border-bottom:none; }
+  .form-group{ margin-bottom:16px; }
+  .form-group label{ display:block; font-weight:700; font-size:13.5px; margin-bottom:5px; }
+  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .toast{
+    position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px);
+    background:var(--navy); color:#fff; padding:13px 26px; border-radius:999px;
+    font-weight:700; font-size:13.5px; box-shadow:var(--shadow); z-index:200;
+    opacity:0; transition:opacity .25s ease, transform .25s ease; pointer-events:none;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---------- Footer ---------- */
+  footer.site-footer{ background:var(--navy-dark); color:#B7BADE; padding:36px 0; margin-top:60px; font-size:13px; }
+  footer.site-footer strong{ color:#fff; }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .choice-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:720px; margin:0 auto; }
+  .choice-card{ background:var(--card); border-radius:var(--radius); padding:30px 22px; text-align:center; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .15s ease; }
+  .choice-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow); }
+
+  .form-card{ background:var(--card); border-radius:var(--radius); padding:34px; box-shadow:var(--shadow-sm); max-width:520px; margin:0 auto; }
+  .form-card.wide{ max-width:720px; }
+
+  .demo-banner{
+    background:var(--yellow-tint); color:#8A6112; text-align:center; padding:9px; font-size:12.5px; font-weight:700;
+  }
+
+  @media (max-width:900px){
+    .hero-inner{ grid-template-columns:1fr; }
+    .hero-stickers{ display:none; }
+    .category-grid{ grid-template-columns:repeat(3,1fr); }
+    .filter-bar{ grid-template-columns:1fr 1fr; }
+    .two-col{ grid-template-columns:1fr; }
+    .form-row{ grid-template-columns:1fr; }
+    .hero h1{ font-size:32px; }
+    .choice-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width:560px){
+    .category-grid{ grid-template-columns:repeat(2,1fr); }
+    .filter-bar{ grid-template-columns:1fr; }
+    nav.main-nav{ gap:10px; }
+    .header-inner{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">🎨 PREVIEW MOCKUP — static HTML, not connected to the real backend. Use the role switcher above to see different logged-in views.</div>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="#" class="logo" onclick="goTo('home');return false;"><span class="balloon">🎈</span> KidSkill<span class="dot">Connect</span></a>
+    <nav class="main-nav">
+      <button class="navlink" onclick="goTo('browse')">Browse Services</button>
+      <button class="navlink" onclick="goTo('register-provider')">Join as Provider</button>
+      <div class="role-switcher">
+        <button id="role-guest" class="active" onclick="setRole('guest')">Guest</button>
+        <button id="role-parent" onclick="setRole('parent')">Parent</button>
+        <button id="role-provider" onclick="setRole('provider')">Provider</button>
+        <button id="role-admin" onclick="setRole('admin')">Admin</button>
+      </div>
+      <span id="dashboard-link"></span>
+    </nav>
+  </div>
+</header>
+
+<div id="toast" class="toast"></div>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <div class="wrap hero-inner">
+        <div>
+          <div class="eyebrow" style="color:var(--yellow);">BANGALORE'S KIDS' SKILL MARKETPLACE</div>
+          <h1 style="margin-top:10px;">Find a trusted <span class="hl">skill trainer</span> for your kid, right in your neighbourhood.</h1>
+          <p class="lead">KidSkill Connect connects Bangalore parents with vetted freelance trainers — singing, dancing, sports, arts, and computers.</p>
+          <div class="cta-row">
+            <button class="btn btn-primary" onclick="goTo('browse')">Book Now</button>
+            <button class="btn btn-outline" style="background:transparent;border-color:#fff;color:#fff;" onclick="goTo('register-provider')">Join as Provider</button>
+          </div>
+        </div>
+        <div class="hero-stickers">
+          <div class="float-badge" style="top:0; left:20px; transform:rotate(-6deg);">
+            <span class="emoji">🎤</span><div><div class="lbl">Sneha K.</div><div class="sub">★ 5.0 · Singing</div></div>
+          </div>
+          <div class="float-badge" style="top:90px; right:0; transform:rotate(5deg);">
+            <span class="emoji">⚽</span><div><div class="lbl">Arjun N.</div><div class="sub">★ 4.8 · Sports</div></div>
+          </div>
+          <div class="float-badge" style="top:200px; left:50px; transform:rotate(-3deg);">
+            <span class="emoji">🎨</span><div><div class="lbl">Meera I.</div><div class="sub">★ 4.9 · Arts</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section wrap">
+      <h2 class="section-title">Explore by category</h2>
+      <p class="section-sub">Every provider on the platform is vetted before going live.</p>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <div class="section wrap" style="padding-top:0;">
+      <h2 class="section-title">Featured providers</h2>
+      <p class="section-sub">A few vetted trainers to get you started.</p>
+      <div class="provider-grid" id="featured-grid"></div>
+    </div>
+
+    <div class="section wrap" style="padding-top:0;">
+      <div class="card" style="background:var(--navy); color:#fff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div>
+          <h3 style="color:#fff;">Are you a freelance trainer?</h3>
+          <p style="color:#CBCDF0; margin:6px 0 0;">Get visibility, structured bookings, and a steady payout.</p>
+        </div>
+        <button class="btn btn-primary" onclick="goTo('register-provider')">Join our network</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BROWSE ============ -->
+  <section id="view-browse" class="view">
+    <div class="section wrap" style="padding-top:28px;">
+      <h2 class="section-title">Browse Services</h2>
+      <p class="section-sub" id="browse-count"></p>
+
+      <div class="filter-bar">
+        <div>
+          <label>Category</label>
+          <select id="f-category" onchange="renderBrowse()">
+            <option value="">All</option>
+            <option>Singing</option><option>Dancing</option><option>Sports</option><option>Arts</option><option>Computers</option>
+          </select>
+        </div>
+        <div>
+          <label>Locality</label>
+          <input id="f-locality" placeholder="e.g. Indiranagar" oninput="renderBrowse()">
+        </div>
+        <div>
+          <label>Kid's age</label>
+          <input id="f-age" type="number" placeholder="e.g. 8" oninput="renderBrowse()">
+        </div>
+        <div>
+          <label>Mode</label>
+          <select id="f-mode" onchange="renderBrowse()">
+            <option value="">Any</option>
+            <option value="in-person">In-person</option>
+            <option value="online">Online</option>
+            <option value="both">Both</option>
+          </select>
+        </div>
+        <div>
+          <label>Sort by</label>
+          <select id="f-sort" onchange="renderBrowse()">
+            <option value="">Newest</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="provider-grid" id="browse-grid"></div>
+    </div>
+  </section>
+
+  <!-- ============ PROVIDER DETAIL ============ -->
+  <section id="view-provider" class="view">
+    <div class="section wrap" style="padding-top:28px;" id="provider-detail-content"></div>
+  </section>
+
+  <!-- ============ REGISTER CHOOSE ============ -->
+  <section id="view-register" class="view">
+    <div class="section wrap">
+      <h2 class="section-title" style="text-align:center;">Join KidSkill Connect</h2>
+      <p class="section-sub" style="text-align:center;">Choose how you'd like to sign up.</p>
+      <div class="choice-grid">
+        <div class="choice-card" onclick="goTo('register-parent')">
+          <div style="font-size:40px;">👨‍👩‍👧</div>
+          <h3>I'm a Parent</h3>
+          <p style="color:var(--muted); font-size:13.5px;">Browse services and book sessions for your kid.</p>
+          <span class="btn btn-primary btn-sm">Sign up as Parent</span>
+        </div>
+        <div class="choice-card" onclick="goTo('register-provider')">
+          <div style="font-size:40px;">🧑‍🏫</div>
+          <h3>I'm a Provider</h3>
+          <p style="color:var(--muted); font-size:13.5px;">List your services and get bookings.</p>
+          <span class="btn btn-secondary btn-sm">Sign up as Provider</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REGISTER PARENT ============ -->
+  <section id="view-register-parent" class="view">
+    <div class="section wrap">
+      <div class="form-card">
+        <h2 class="section-title">Sign up as a Parent</h2>
+        <p class="section-sub">Browse and book skill-training sessions for your kid.</p>
+        <form onsubmit="return mockSubmit(event,'parent')">
+          <div class="form-group"><label>Full name</label><input required></div>
+          <div class="form-group"><label>Email</label><input type="email" required></div>
+          <div class="form-group"><label>Password</label><input type="password" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Phone</label><input type="tel"></div>
+            <div class="form-group"><label>Locality</label><input placeholder="e.g. Indiranagar"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ REGISTER PROVIDER ============ -->
+  <section id="view-register-provider" class="view">
+    <div class="section wrap">
+      <div class="form-card wide">
+        <h2 class="section-title">Join as a Provider</h2>
+        <p class="section-sub">Your profile goes live after a quick admin review.</p>
+        <form onsubmit="return mockSubmit(event,'provider')">
+          <h3 style="font-size:15px;">Account details</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Full name</label><input required></div>
+            <div class="form-group"><label>Email</label><input type="email" required></div>
+          </div>
+          <h3 style="font-size:15px; margin-top:20px;">Service details</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Skill category</label>
+              <select><option>Singing</option><option>Dancing</option><option>Sports</option><option>Arts</option><option>Computers</option></select>
+            </div>
+            <div class="form-group"><label>Locality</label><input placeholder="e.g. Koramangala" required></div>
+          </div>
+          <div class="form-group"><label>Headline</label><input placeholder="e.g. Hip-Hop & Contemporary for Kids"></div>
+          <div class="form-group"><label>Description</label><textarea rows="3" placeholder="Tell parents about your experience"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Price min (₹)</label><input type="number"></div>
+            <div class="form-group"><label>Price max (₹)</label><input type="number"></div>
+          </div>
+          <div class="form-group"><label>Credentials (optional)</label><input type="file"></div>
+          <button type="submit" class="btn btn-secondary btn-block">Submit for Review</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PARENT DASHBOARD ============ -->
+  <section id="view-dashboard-parent" class="view">
+    <div class="section wrap" style="padding-top:28px;">
+      <h2 class="section-title">My Bookings</h2>
+      <p class="section-sub">Track your requests from start to finish.</p>
+      <div id="parent-bookings"></div>
+    </div>
+  </section>
+
+  <!-- ============ PROVIDER DASHBOARD ============ -->
+  <section id="view-dashboard-provider" class="view">
+    <div class="section wrap" style="padding-top:28px;">
+      <h2 class="section-title">My Dashboard</h2>
+      <div style="display:flex; gap:14px; margin-bottom:26px; flex-wrap:wrap;">
+        <div class="stat-box" style="flex:1; min-width:140px;"><div class="stat-num">₹6,120</div><div class="stat-label">Total Payout</div></div>
+        <div class="stat-box" style="flex:1; min-width:140px;"><div class="stat-num">4</div><div class="stat-label">Total Bookings</div></div>
+        <div class="stat-box" style="flex:1; min-width:140px;"><div class="badge badge-green" style="font-size:13.5px;">Live</div><div class="stat-label" style="margin-top:6px;">Profile Status</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <h3 style="font-size:17px;">Booking Requests</h3>
+          <div id="provider-bookings"></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:17px;">Edit Profile</h3>
+          <p class="hint">This is a preview — profile editing is wired up in the real app.</p>
+          <div class="form-group"><label>Headline</label><input value="Hindustani &amp; Western Vocals for Kids"></div>
+          <div class="form-group"><label>Price range (₹)</label><div class="form-row"><input value="800"><input value="1500"></div></div>
+          <button class="btn btn-secondary btn-block" onclick="toast('Saved (preview only)')">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN DASHBOARD ============ -->
+  <section id="view-admin" class="view">
+    <div class="section wrap" style="padding-top:28px;">
+      <h2 class="section-title">Admin Dashboard</h2>
+      <div style="display:flex; gap:14px; margin-bottom:26px; flex-wrap:wrap;">
+        <div class="stat-box" style="flex:1; min-width:120px;"><div class="stat-num">2</div><div class="stat-label">Parents</div></div>
+        <div class="stat-box" style="flex:1; min-width:120px;"><div class="stat-num">9</div><div class="stat-label">Providers</div></div>
+        <div class="stat-box" style="flex:1; min-width:120px;"><div class="stat-num">4</div><div class="stat-label">Bookings</div></div>
+        <div class="stat-box" style="flex:1; min-width:120px;"><div class="stat-num">₹4,200</div><div class="stat-label">Gross Paid</div></div>
+        <div class="stat-box" style="flex:1; min-width:120px;"><div class="stat-num">₹630</div><div class="stat-label">Commission</div></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:17px;">Pending Provider Approvals (1)</h3>
+        <div class="review-item">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong>Vikram Singh</strong> — <span class="badge badge-coral">Sports</span>
+              <div class="provider-meta" style="margin-top:4px;"><span>📍 Whitefield</span><span>✉️ vikram@example.com</span></div>
+              <p style="font-size:13px; margin:6px 0;">Former club-level cricketer, new to the platform.</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-primary btn-sm" onclick="approveVikram()">Approve</button>
+              <button class="btn btn-outline btn-sm" onclick="toast('Rejected (preview only)')">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:17px;">Transactions</h3>
+        <table>
+          <tr><th>Booking</th><th>Parent</th><th>Provider</th><th>Amount</th><th>Commission</th><th>Status</th></tr>
+          <tr><td>#1</td><td>Anjali Rao</td><td>Sneha Kulkarni</td><td>₹1,000</td><td>₹150</td><td><span class="badge badge-green">success</span></td></tr>
+          <tr><td>#2</td><td>Rohan Mehta</td><td>Meera Iyer</td><td>₹900</td><td>₹135</td><td><span class="badge badge-green">success</span></td></tr>
+          <tr><td>#3</td><td>Anjali Rao</td><td>Arjun Nair</td><td>₹1,200</td><td>₹180</td><td><span class="badge badge-green">success</span></td></tr>
+          <tr><td>#4</td><td>Priya Kumar</td><td>Karthik S.</td><td>₹1,100</td><td>₹165</td><td><span class="badge badge-red">failed</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div><strong>KidSkill Connect</strong> — connecting parents with vetted skill-training providers for kids in Bangalore.</div>
+    <div style="margin-top:6px;">connect@kidskillconnect.in &nbsp;·&nbsp; This is a static preview file — no data is saved or sent anywhere.</div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   MOCK DATA — mirrors the seeded data in the real backend
+   ============================================================ */
+const PROVIDERS = [
+  { id:1, name:"Sneha Kulkarni", skill:"Singing", emoji:"🎤", headline:"Hindustani & Western Vocals for Kids", bio:"Trained vocalist with 8 years teaching children aged 6-16. Focus on breathing, pitch, and stage confidence.", locality:"Indiranagar", mode:"both", age:"6-16", pmin:800, pmax:1500, rating:5.0, reviews:[{parent:"Anjali Rao", rating:5, comment:"Sneha was fantastic, my son loved his first lesson!"}] },
+  { id:2, name:"Rahul Mehta", skill:"Dancing", emoji:"💃", headline:"Hip-Hop & Contemporary for Kids", bio:"Ex-competitive dancer, now teaching high-energy hip-hop and contemporary to kids aged 5-14.", locality:"Koramangala", mode:"in-person", age:"5-14", pmin:600, pmax:1200, rating:4.7, reviews:[{parent:"Rohan Mehta", rating:5, comment:"Great energy, kids stayed engaged the whole class."}] },
+  { id:3, name:"Arjun Nair", skill:"Sports", emoji:"⚽", headline:"Football & Badminton Coaching", bio:"State-level football coach running weekend batches for kids 7-15. Focus on fundamentals and fitness.", locality:"HSR Layout", mode:"in-person", age:"7-15", pmin:700, pmax:1400, rating:4.8, reviews:[] },
+  { id:4, name:"Meera Iyer", skill:"Arts", emoji:"🎨", headline:"Sketching, Watercolor & Craft", bio:"Fine arts graduate teaching sketching and watercolor to young kids in a fun, pressure-free style.", locality:"Jayanagar", mode:"both", age:"4-12", pmin:500, pmax:1000, rating:4.9, reviews:[{parent:"Priya Kumar", rating:5, comment:"My daughter looks forward to this every week."}] },
+  { id:5, name:"Karthik Subramaniam", skill:"Computers", emoji:"💻", headline:"Scratch Coding & Robotics Basics", bio:"Software engineer teaching Scratch programming and basic robotics kits to kids 8-15.", locality:"Whitefield", mode:"online", age:"8-15", pmin:900, pmax:1800, rating:4.6, reviews:[] },
+  { id:6, name:"Divya Prakash", skill:"Singing", emoji:"🎤", headline:"Carnatic Vocals — Beginner Friendly", bio:"Carnatic-trained vocalist, patient with true beginners aged 5 and up.", locality:"Jayanagar", mode:"in-person", age:"5-13", pmin:600, pmax:1100, rating:4.8, reviews:[] },
+  { id:7, name:"Farhan Sheikh", skill:"Dancing", emoji:"💃", headline:"Bollywood & Freestyle", bio:"Choreographer for school events, now teaching Bollywood-style dance to kids 6-15.", locality:"Indiranagar", mode:"both", age:"6-15", pmin:550, pmax:1050, rating:4.5, reviews:[] },
+  { id:8, name:"Priya Das", skill:"Arts", emoji:"🎨", headline:"Clay Modelling & Craft for Little Ones", bio:"Specializes in tactile art for younger kids aged 4-9 — clay, collage, and simple painting.", locality:"Koramangala", mode:"in-person", age:"4-9", pmin:450, pmax:900, rating:4.9, reviews:[] },
+];
+
+const CATEGORY_EMOJI = { Singing:"🎤", Dancing:"💃", Sports:"⚽", Arts:"🎨", Computers:"💻" };
+
+let PARENT_BOOKINGS = [
+  { id:101, provider:"Sneha Kulkarni", skill:"Singing", kid:"Aarav (9)", date:"2026-08-25", amount:1000, status:"requested" },
+  { id:102, provider:"Arjun Nair", skill:"Sports", kid:"Aarav (9)", date:"2026-08-10", amount:1200, status:"paid" },
+  { id:103, provider:"Meera Iyer", skill:"Arts", kid:"Diya (6)", date:"2026-07-28", amount:900, status:"completed" },
+];
+
+let PROVIDER_BOOKINGS = [
+  { id:201, parent:"Anjali Rao", kid:"Aarav (9)", date:"2026-08-25", amount:1000, payout:850, status:"requested" },
+  { id:202, parent:"Kavya Reddy", kid:"Ishaan (7)", date:"2026-08-18", amount:1200, payout:1020, status:"accepted" },
+  { id:203, parent:"Rohan Mehta", kid:"Myra (11)", date:"2026-08-02", amount:1100, payout:935, status:"completed" },
+];
+
+let currentRole = "guest";
+let currentView = "home";
+let currentProviderId = null;
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function badgeClass(status){
+  if (status==='requested') return 'badge-yellow';
+  if (status==='accepted') return 'badge-navy';
+  if (status==='paid' || status==='completed') return 'badge-green';
+  return 'badge-red';
+}
+
+function setRole(role){
+  currentRole = role;
+  ['guest','parent','provider','admin'].forEach(r=>{
+    document.getElementById('role-'+r).classList.toggle('active', r===role);
+  });
+  const linkSpan = document.getElementById('dashboard-link');
+  linkSpan.innerHTML = '';
+  if (role==='parent'){
+    linkSpan.innerHTML = '<button class="navlink" onclick="goTo(\'dashboard-parent\')">My Bookings</button>';
+    toast('Viewing as Parent — Anjali Rao');
+  } else if (role==='provider'){
+    linkSpan.innerHTML = '<button class="navlink" onclick="goTo(\'dashboard-provider\')">My Dashboard</button>';
+    toast('Viewing as Provider — Sneha Kulkarni');
+  } else if (role==='admin'){
+    linkSpan.innerHTML = '<button class="navlink" onclick="goTo(\'admin\')">Admin</button>';
+    toast('Viewing as Admin');
+  } else {
+    toast('Viewing as Guest (logged out)');
+  }
+  if (role==='parent') goTo('dashboard-parent');
+  else if (role==='provider') goTo('dashboard-provider');
+  else if (role==='admin') goTo('admin');
+  else goTo('home');
+}
+
+function goTo(view){
+  currentView = view;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el = document.getElementById('view-'+view);
+  if (el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+  render();
+}
+
+function openProvider(id){
+  currentProviderId = id;
+  goTo('provider');
+}
+
+function mockSubmit(e, role){
+  e.preventDefault();
+  toast(role === 'parent' ? 'Account created! (preview only)' : 'Profile submitted for review! (preview only)');
+  setRole(role);
+  return false;
+}
+
+function requestBooking(providerId){
+  if (currentRole !== 'parent'){
+    toast('Switch to "Parent" view to request a booking');
+    return;
+  }
+  const p = PROVIDERS.find(x=>x.id===providerId);
+  const newBooking = { id: 100+PARENT_BOOKINGS.length+1, provider:p.name, skill:p.skill, kid:"Aarav (9)", date:"2026-09-05", amount:p.pmin, status:"requested" };
+  PARENT_BOOKINGS.unshift(newBooking);
+  toast('Request sent to ' + p.name + '!');
+  goTo('dashboard-parent');
+}
+
+function advanceParentBooking(id, newStatus){
+  const b = PARENT_BOOKINGS.find(x=>x.id===id);
+  if (b) b.status = newStatus;
+  toast('Booking #' + id + ' → ' + newStatus);
+  renderParentDashboard();
+}
+
+function advanceProviderBooking(id, newStatus){
+  const b = PROVIDER_BOOKINGS.find(x=>x.id===id);
+  if (b) b.status = newStatus;
+  toast('Booking #' + id + ' → ' + newStatus);
+  renderProviderDashboard();
+}
+
+function approveVikram(){
+  toast('Vikram Singh approved — now live on the platform!');
+}
+
+/* ============================================================
+   RENDERERS
+   ============================================================ */
+function providerCard(p){
+  const stars = p.reviews.length ? `<div class="rating-stars">★ ${p.rating.toFixed(1)} <span style="color:var(--muted);font-weight:400;">(${p.reviews.length})</span></div>` : `<div class="hint">No reviews yet</div>`;
+  const initials = p.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+  return `
+    <div class="provider-card" onclick="openProvider(${p.id})">
+      <div class="provider-avatar">${initials}</div>
+      <span class="badge badge-coral">${p.skill}</span>
+      <div class="provider-name">${p.name}</div>
+      <div class="provider-headline">${p.headline}</div>
+      <div class="provider-meta">
+        <span>📍 ${p.locality}</span>
+        <span style="text-transform:capitalize;">🖥️ ${p.mode}</span>
+        <span>🎂 ${p.age} yrs</span>
+      </div>
+      ${stars}
+      <div class="provider-price">₹${p.pmin}–${p.pmax} / session</div>
+    </div>`;
+}
+
+function renderCategoryGrid(){
+  const cats = [
+    {name:'Singing', emoji:'🎤'}, {name:'Dancing', emoji:'💃'}, {name:'Sports', emoji:'⚽'},
+    {name:'Arts', emoji:'🎨'}, {name:'Computers', emoji:'💻'},
+  ];
+  document.getElementById('category-grid').innerHTML = cats.map(c => `
+    <button class="category-card sticker" onclick="goTo('browse'); document.getElementById('f-category').value='${c.name}'; renderBrowse();">
+      <div class="category-emoji">${c.emoji}</div>
+      <div class="category-name">${c.name}</div>
+    </button>`).join('');
+}
+
+function renderFeatured(){
+  const featured = PROVIDERS.slice(0,4);
+  document.getElementById('featured-grid').innerHTML = featured.map(providerCard).join('');
+}
+
+function renderBrowse(){
+  const cat = document.getElementById('f-category').value;
+  const loc = document.getElementById('f-locality').value.toLowerCase();
+  const age = document.getElementById('f-age').value;
+  const mode = document.getElementById('f-mode').value;
+  const sort = document.getElementById('f-sort').value;
+
+  let list = PROVIDERS.filter(p=>{
+    if (cat && p.skill !== cat) return false;
+    if (loc && !p.locality.toLowerCase().includes(loc)) return false;
+    if (mode && !(p.mode === mode || p.mode === 'both')) return false;
+    if (age){
+      const [lo,hi] = p.age.split('-').map(Number);
+      if (Number(age) < lo || Number(age) > hi) return false;
+    }
+    return true;
+  });
+
+  if (sort==='price_low') list.sort((a,b)=>a.pmin-b.pmin);
+  else if (sort==='price_high') list.sort((a,b)=>b.pmax-a.pmax);
+  else if (sort==='rating') list.sort((a,b)=>b.rating-a.rating);
+
+  document.getElementById('browse-count').textContent = `${list.length} vetted provider${list.length===1?'':'s'} found`;
+  document.getElementById('browse-grid').innerHTML = list.length
+    ? list.map(providerCard).join('')
+    : `<div class="card" style="grid-column:1/-1; text-align:center; color:var(--muted);">No providers match those filters yet — try widening your search.</div>`;
+}
+
+function renderProviderDetail(){
+  const p = PROVIDERS.find(x=>x.id===currentProviderId);
+  if (!p){ document.getElementById('provider-detail-content').innerHTML = ''; return; }
+  const initials = p.name.split(' ').map(w=>w[0]).slice(0,2).join('');
+  const reviewsHtml = p.reviews.length
+    ? p.reviews.map(r=>`
+        <div class="review-item">
+          <div class="rating-stars">${'★'.repeat(r.rating)}<span style="color:#ddd;">${'★'.repeat(5-r.rating)}</span> <strong style="color:var(--ink);">${r.parent}</strong></div>
+          <p style="margin:4px 0 0; font-size:13.5px;">${r.comment}</p>
+        </div>`).join('')
+    : `<p class="hint">No reviews yet — be the first to book and review!</p>`;
+
+  const bookingBox = currentRole === 'parent' ? `
+    <div class="card">
+      <h3 style="font-size:17px;">Request a booking</h3>
+      <form onsubmit="event.preventDefault(); requestBooking(${p.id});">
+        <div class="form-group"><label>Kid's name</label><input required></div>
+        <div class="form-group"><label>Kid's age</label><input type="number" required></div>
+        <div class="form-group"><label>Preferred date</label><input type="date" required></div>
+        <div class="form-group"><label>Agreed amount (₹)</label><input type="number" value="${p.pmin}" required></div>
+        <button type="submit" class="btn btn-primary btn-block">Send Request</button>
+      </form>
+    </div>` : `
+    <div class="card">
+      <h3 style="font-size:17px;">Request a booking</h3>
+      <p class="hint">Switch to "Parent" in the role switcher above to try requesting a booking.</p>
+      <button class="btn btn-primary btn-block" onclick="setRole('parent')">View as Parent</button>
+    </div>`;
+
+  document.getElementById('provider-detail-content').innerHTML = `
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <div class="provider-avatar" style="width:64px;height:64px;font-size:22px;">${initials}</div>
+          <span class="badge badge-coral">${p.skill}</span>
+          <h2 style="margin-top:8px;">${p.name}</h2>
+          <div class="provider-headline" style="font-size:15px;">${p.headline}</div>
+          <div class="provider-meta" style="margin:10px 0;">
+            <span>📍 ${p.locality}</span>
+            <span style="text-transform:capitalize;">🖥️ ${p.mode}</span>
+            <span>🎂 Ages ${p.age}</span>
+          </div>
+          ${p.reviews.length ? `<div class="rating-stars">★ ${p.rating.toFixed(1)} average · ${p.reviews.length} review${p.reviews.length===1?'':'s'}</div>` : ''}
+          <p style="margin-top:14px;">${p.bio}</p>
+          <div class="provider-price" style="font-size:18px;">₹${p.pmin}–${p.pmax} / session</div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:17px;">Reviews</h3>
+          ${reviewsHtml}
+        </div>
+      </div>
+      <div>${bookingBox}</div>
+    </div>`;
+}
+
+function renderParentDashboard(){
+  document.getElementById('parent-bookings').innerHTML = PARENT_BOOKINGS.map(b => `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div><span class="badge badge-coral">${b.skill}</span> <strong style="margin-left:6px;">${b.provider}</strong></div>
+        <span class="badge ${badgeClass(b.status)}">${b.status}</span>
+      </div>
+      <div class="provider-meta" style="margin-top:8px;">
+        <span>👶 ${b.kid}</span><span>🗓️ ${b.date}</span><span>₹${b.amount}</span>
+      </div>
+      ${b.status==='accepted' ? `<button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="advanceParentBooking(${b.id},'paid')">Pay ₹${b.amount} to Confirm</button>` : ''}
+      ${b.status==='paid' ? `<button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="advanceParentBooking(${b.id},'completed')">Mark Session Completed</button>` : ''}
+      ${b.status==='completed' ? `<button class="btn btn-outline btn-sm" style="margin-top:8px;" onclick="toast('Review submitted! (preview only)')">Leave a Review</button>` : ''}
+    </div>`).join('');
+}
+
+function renderProviderDashboard(){
+  document.getElementById('provider-bookings').innerHTML = PROVIDER_BOOKINGS.map(b => `
+    <div class="review-item">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>${b.kid}</strong>
+        <span class="badge ${badgeClass(b.status)}">${b.status}</span>
+      </div>
+      <div class="provider-meta" style="margin-top:4px;">
+        <span>👤 ${b.parent}</span><span>🗓️ ${b.date}</span><span>₹${b.amount} (you get ₹${b.payout})</span>
+      </div>
+      ${b.status==='requested' ? `
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button class="btn btn-primary btn-sm" onclick="advanceProviderBooking(${b.id},'accepted')">Accept</button>
+          <button class="btn btn-outline btn-sm" onclick="advanceProviderBooking(${b.id},'declined')">Decline</button>
+        </div>` : ''}
+    </div>`).join('');
+}
+
+function render(){
+  if (currentView==='home'){ renderCategoryGrid(); renderFeatured(); }
+  else if (currentView==='browse'){ renderBrowse(); }
+  else if (currentView==='provider'){ renderProviderDetail(); }
+  else if (currentView==='dashboard-parent'){ renderParentDashboard(); }
+  else if (currentView==='dashboard-provider'){ renderProviderDashboard(); }
+}
+
+// initial paint
+render();
+</script>
+</body>
+</html>

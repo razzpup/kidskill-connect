@@ -1,0 +1,234 @@
+/* ------------------------------------------------------------------------
+   Scoped, literal styling lifted from KidSkill_Connect_Website_Mockup.html.
+   This is a deliberate, page-scoped departure from the palette and fonts
+   mandated in CLAUDE.md — confirmed with the user. Everything here is
+   namespaced under `.km-*` so it cannot leak into the parent/trainer/admin
+   surfaces, which keep the real design system untouched.
+   ------------------------------------------------------------------------ */
+
+.km-page {
+  --km-navy: #2B2E86;
+  --km-navy-dark: #1E2160;
+  --km-coral: #FF6F59;
+  --km-coral-dark: #E85A45;
+  --km-yellow: #FFC857;
+  --km-yellow-dark: #F0AE2E;
+  --km-paper: #FFF9F2;
+  --km-ink: #252654;
+  --km-muted: #6B6E9B;
+  --km-card: #FFFFFF;
+  --km-coral-tint: #FFE8E3;
+  --km-yellow-tint: #FFF3D6;
+  --km-navy-tint: #E7E8F7;
+  --km-line: #E2E1F2;
+  --km-radius: 20px;
+  --km-radius-sm: 12px;
+  --km-shadow: 0 10px 30px rgba(43, 46, 134, 0.10);
+  --km-shadow-sm: 0 4px 14px rgba(43, 46, 134, 0.08);
+
+  background: var(--km-paper);
+  color: var(--km-ink);
+  font-family: var(--km-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.km-page h1, .km-page h2, .km-page h3, .km-page h4 {
+  font-family: var(--km-font-display);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.km-page button { font-family: inherit; }
+
+.km-eyebrow {
+  font-family: var(--km-font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--km-coral-dark);
+}
+
+/* ---------- header ---------- */
+.km-header {
+  background: var(--km-navy);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 16px rgba(30, 33, 96, 0.18);
+}
+.km-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  gap: 14px;
+  flex-wrap: wrap;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+.km-logo {
+  font-family: var(--km-font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.km-logo .km-balloon { font-size: 22px; transform: rotate(-8deg); display: inline-block; }
+.km-logo .km-dot { color: var(--km-yellow); }
+.km-login-row { display: flex; gap: 10px; }
+
+/* ---------- buttons ---------- */
+.km-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  font-family: inherit;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.km-btn:active { transform: scale(0.98); }
+.km-btn-primary { background: var(--km-coral); color: #fff; }
+.km-btn-primary:hover { background: var(--km-coral-dark); }
+.km-btn-secondary { background: var(--km-yellow); color: var(--km-navy-dark); }
+.km-btn-secondary:hover { background: var(--km-yellow-dark); }
+.km-btn-outline-onnavy { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.55); }
+.km-btn-outline-onnavy:hover { background: rgba(255,255,255,0.1); }
+.km-btn-block { width: 100%; justify-content: center; }
+.km-btn-sm { padding: 9px 18px; font-size: 13px; }
+.km-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- hero ---------- */
+.km-hero {
+  background: linear-gradient(180deg, var(--km-navy) 0%, var(--km-navy-dark) 100%);
+  color: #fff;
+  padding: 56px 20px 60px;
+  position: relative;
+  overflow: hidden;
+}
+.km-hero::before {
+  content: ""; position: absolute; top: -90px; right: -90px;
+  width: 320px; height: 320px; border-radius: 50%;
+  background: var(--km-navy-dark); opacity: 0.7;
+}
+.km-hero::after {
+  content: ""; position: absolute; bottom: -120px; left: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: rgba(255, 200, 87, 0.06);
+}
+.km-hero-inner {
+  position: relative; z-index: 2; max-width: 1140px; margin: 0 auto;
+  display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 40px; align-items: center;
+}
+.km-hero h1 { font-size: 40px; line-height: 1.12; max-width: 560px; }
+.km-hero h1 .km-hl { color: var(--km-yellow); }
+.km-hero p.km-lead { font-size: 16px; color: #C9CBEF; max-width: 480px; margin: 16px 0 26px; line-height: 1.55; }
+.km-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.km-hero-stickers { position: relative; height: 300px; }
+.km-float-badge {
+  position: absolute; background: #fff; border-radius: 18px; padding: 13px 16px;
+  box-shadow: var(--km-shadow); display: flex; align-items: center; gap: 10px; color: var(--km-ink);
+}
+.km-float-badge .km-emoji { font-size: 24px; }
+.km-float-badge .km-lbl { font-weight: 700; font-size: 13px; }
+.km-float-badge .km-sub { font-size: 11px; color: var(--km-muted); }
+
+/* ---------- sections ---------- */
+.km-section { padding: 48px 20px; max-width: 1140px; margin: 0 auto; }
+.km-section-title { font-size: 26px; margin-bottom: 4px; }
+.km-section-sub { color: var(--km-muted); font-size: 14px; margin-bottom: 26px; }
+
+.km-group { margin-bottom: 30px; }
+.km-group:last-child { margin-bottom: 0; }
+.km-group-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--km-font-display); font-weight: 700; font-size: 17px;
+  margin-bottom: 12px;
+}
+.km-group-emoji { font-size: 20px; }
+
+.km-sticker-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.km-sticker {
+  background: var(--km-card); border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--km-shadow-sm);
+  border: none; cursor: default;
+  font-family: var(--km-font-display); font-weight: 700; font-size: 13.5px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+}
+.km-sticker::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 2px dashed rgba(43, 46, 134, 0.14); pointer-events: none;
+}
+.km-sticker:nth-child(3n+1) { transform: rotate(-1.4deg); }
+.km-sticker:nth-child(3n+2) { transform: rotate(1.4deg); }
+.km-sticker:nth-child(3n)   { transform: rotate(-0.6deg); }
+.km-sticker:hover { transform: scale(1.05) rotate(0deg); box-shadow: var(--km-shadow); }
+.km-sticker .km-emoji { font-size: 20px; }
+
+/* ---------- choice cards (the two doors) ---------- */
+/* Centered as its own moment on the page, not one section among several — the two
+   cards are equal height and their buttons line up on the same baseline regardless of
+   how much copy either one has, which is what "vertically aligned" means here. */
+.km-choice-section { max-width: 640px; margin: 0 auto; text-align: center; }
+.km-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
+.km-choice-card {
+  display: flex; flex-direction: column; align-items: flex-start; height: 100%;
+  background: var(--km-card); border-radius: var(--km-radius); padding: 28px 22px; text-align: left;
+  box-shadow: var(--km-shadow-sm); cursor: pointer; border: none; font-family: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.km-choice-card:hover { transform: translateY(-4px); box-shadow: var(--km-shadow); }
+.km-choice-emoji { font-size: 38px; }
+.km-choice-card h3 { margin-top: 10px; font-size: 19px; }
+.km-choice-card p { flex: 1; color: var(--km-muted); font-size: 13.5px; margin: 8px 0 14px; line-height: 1.5; }
+.km-choice-card .km-btn { align-self: flex-start; }
+
+/* ---------- form card (phone / otp) ---------- */
+.km-form-card {
+  background: var(--km-card); border-radius: var(--km-radius); padding: 30px;
+  box-shadow: var(--km-shadow-sm); max-width: 480px; margin: 0 auto;
+}
+.km-form-group { margin-bottom: 16px; }
+.km-form-group label {
+  display: block; font-weight: 700; font-size: 12.5px; margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.03em; color: var(--km-muted);
+}
+.km-input {
+  width: 100%; padding: 13px 14px; border: 1.5px solid var(--km-line); border-radius: var(--km-radius-sm);
+  font-size: 15px; font-family: inherit; background: #fff; color: var(--km-ink); outline: none;
+}
+.km-input:focus { border-color: var(--km-coral); }
+.km-hint { font-size: 12.5px; color: var(--km-muted); margin-top: 6px; line-height: 1.5; }
+.km-error {
+  margin-top: 12px; border-radius: var(--km-radius-sm); background: #FBE4E1; color: #C7402F;
+  padding: 10px 14px; font-size: 13px; line-height: 1.5;
+}
+.km-back {
+  background: none; border: none; color: var(--km-muted); font-weight: 600; font-size: 13px;
+  cursor: pointer; padding: 4px 0; margin-bottom: 8px;
+}
+.km-back:hover { color: var(--km-ink); }
+
+/* ---------- footer ---------- */
+.km-footer { background: var(--km-navy-dark); color: #B7BADE; padding: 30px 20px; font-size: 12.5px; }
+.km-footer strong { color: #fff; }
+.km-footer-inner { max-width: 1140px; margin: 0 auto; }
+
+@media (max-width: 900px) {
+  .km-hero-inner { grid-template-columns: 1fr; }
+  .km-hero-stickers { display: none; }
+  .km-hero h1 { font-size: 30px; }
+  .km-choice-grid { grid-template-columns: 1fr; }
+  .km-login-row .km-btn-sm-label { display: none; }
+}

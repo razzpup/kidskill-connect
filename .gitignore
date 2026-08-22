@@ -1,0 +1,16 @@
+node_modules
+.next
+.env.local
+supabase/.temp
+supabase/.branches
+*.tsbuildinfo
+next-env.d.ts
+
+# Stray root-level duplicates/artifacts predating version control — superseded by the
+# real copies in supabase/migrations/, lib/, and docs/. Left on disk, not tracked.
+/0001_init.sql
+/.money.mjs
+/spec.md
+
+# Ephemeral local dev state — a fresh URL every time ngrok restarts on the free tier.
+.ngrok-url

@@ -1,0 +1,196 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ type
+   Fontshare, self-hosted from /public/fonts. No Google Fonts, no CDN.
+   Cabinet Grotesk sets display and headings; Switzer does UI, body and every
+   number. Numbers are tabular everywhere so ledger columns align. */
+
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-800.woff2') format('woff2'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+@theme {
+  --font-display: 'Cabinet Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ------------------------------------------------------------------ palette
+   Two surfaces, one accent. Marigold is money and nothing else — if it shows up
+   on a non-financial element, that is a bug, not a style choice. */
+
+.theme-light {
+  --paper: #F2F4F1;
+  --card: #FFFFFF;
+  --ink: #1A2420;
+  --muted: #6B7670;
+  --grass: #2F6F4E;
+  --marigold: #F0B429;
+  --line: #DDE2DC;
+
+  --grass-wash: #EAF1EC;
+  --marigold-wash: #FBF1DC;
+  --alert: #B0472F;
+  --alert-wash: #F7E9E5;
+  --shadow: 0 1px 2px rgb(26 36 32 / 0.04), 0 8px 24px -12px rgb(26 36 32 / 0.10);
+}
+
+.theme-dark {
+  --paper: #121512;
+  --card: #1C211D;
+  --ink: #E8EDE7;
+  --muted: #8A948C;
+  --grass: #4E9B72;
+  --marigold: #F0B429;
+  --line: #2A312C;
+
+  --grass-wash: #1B2A22;
+  --marigold-wash: #2C2617;
+  /* One colour beyond the brief, used only for stalled services and rejected
+     applications on the dashboards. Marigold could not do this job without
+     breaking the money-only rule. */
+  --alert: #C2553D;
+  --alert-wash: #2B1A16;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.30), 0 8px 24px -12px rgb(0 0 0 / 0.60);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-grass: var(--grass);
+  --color-marigold: var(--marigold);
+  --color-line: var(--line);
+  --color-grass-wash: var(--grass-wash);
+  --color-marigold-wash: var(--marigold-wash);
+  --color-alert: var(--alert);
+  --color-alert-wash: var(--alert-wash);
+}
+
+/* ------------------------------------------------------------------ base */
+
+* { border-color: var(--line); }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01' on;
+}
+
+::selection { background: var(--grass); color: var(--card); }
+
+:focus-visible {
+  outline: 2px solid var(--grass);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Every number in the product — money, distances, dates, ratings — is tabular,
+   so columns line up and figures don't jitter as they update over realtime. */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' on, 'lnum' on;
+}
+
+.display { font-family: var(--font-display); letter-spacing: -0.02em; }
+
+/* Eyebrow labels. Switzer, never monospace — monospace on a label reads as
+   debug output, and this is a product a parent uses in daylight. */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------------ spine
+   The signature element. The rail is not a decorative line: its thickness at
+   each point is the skill rating recorded at that point, so the thread of a
+   child's history visibly thickens toward the present. */
+
+.spine-rail {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--grass) 100%, transparent),
+    color-mix(in oklab, var(--grass) 55%, transparent)
+  );
+  border-radius: 999px;
+}
+
+.spine-node {
+  box-shadow: 0 0 0 4px var(--paper);
+}
+
+@keyframes spine-arrive {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* A new entry arriving over realtime is the demo's payoff. It should land, not
+   blink into existence. */
+.spine-entry-new {
+  animation: spine-arrive 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes money-tick {
+  0%   { background-color: var(--marigold-wash); }
+  100% { background-color: transparent; }
+}
+
+.money-tick { animation: money-tick 1400ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------------ inputs */
+
+input, textarea, select, button { font: inherit; color: inherit; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 28px;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  background: var(--line);
+  border-radius: 999px;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -9px;
+  width: 21px;
+  height: 21px;
+  border-radius: 999px;
+  background: var(--grass);
+  border: 3px solid var(--card);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.22);
+  cursor: grab;
+}
+input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
+input[type="range"]::-moz-range-track { height: 3px; background: var(--line); border-radius: 999px; }
+input[type="range"]::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 999px;
+  background: var(--grass); border: 3px solid var(--card);
+}
+
+::placeholder { color: var(--muted); opacity: 1; }
+
+textarea { resize: vertical; }
