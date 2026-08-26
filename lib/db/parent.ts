@@ -43,6 +43,50 @@ export async function myLocation(): Promise<StoredLocation | null> {
   return { lat: Number(row.lat), lng: Number(row.lng), areaLabel: row.area_label }
 }
 
+/**
+ * Which of the standard weekly slots (see components/SlotPicker) this coach already
+ * has a running class in. There is no separate "availability" the coach declares — this
+ * is read straight off their active enrollments, so it can never claim a slot is free
+ * when it's actually booked.
+ */
+export async function trainerBookedSlots(trainerId: string): Promise<{ weekday: number; time: string }[]> {
+  const supabase = await supabaseServer()
+  const { data, error } = await supabase
+    .from('enrollments')
+    .select('schedule_weekday, schedule_time')
+    .eq('trainer_id', trainerId)
+    .eq('status', 'active')
+    .not('schedule_weekday', 'is', null)
+    .not('schedule_time', 'is', null)
+  if (error) throw error
+  return (data ?? []).map((d) => ({
+    weekday: d.schedule_weekday as number,
+    time: (d.schedule_time as string).slice(0, 5),
+  }))
+}
+
+/**
+ * What's actually taken on this coach's calendar in a date window — real sessions, not
+ * a weekly template. Goes through a security-definer RPC on purpose: enrollments_parties
+ * RLS only lets the parent or trainer already ON an enrollment see it, so a parent who's
+ * never booked with this coach before would get zero rows from a direct table read and
+ * every slot would silently look free, whether it was or not.
+ */
+export async function trainerBusyInstants(
+  trainerId: string,
+  fromISO: string,
+  toISO: string,
+): Promise<string[]> {
+  const supabase = await supabaseServer()
+  const { data, error } = await supabase.rpc('trainer_busy_instants', {
+    p_trainer_id: trainerId,
+    p_from: fromISO,
+    p_to: toISO,
+  })
+  if (error) throw error
+  return (data ?? []).map((d: { scheduled_at: string }) => d.scheduled_at)
+}
+
 export async function listCategories(): Promise<Category[]> {
   const supabase = await supabaseServer()
   const { data, error } = await supabase
@@ -98,6 +142,29 @@ export function walletStrip(
     classesRemaining: active.reduce((sum, e) => sum + e.classesRemaining, 0),
     activeEnrollments: active.length,
   }
+}
+
+/**
+ * The resting `parent_wallet` balance — money topped up ahead of picking a coach.
+ * Distinct from `heldInEscrow`, which is money already committed to a specific
+ * enrollment: `fund_enrollment` moves a topup and its matching hold through the wallet
+ * in the same transaction, so this only ever shows what hasn't been spent yet.
+ */
+export async function parentWalletBalance(parentId: string): Promise<Paise> {
+  const supabase = await supabaseServer()
+  // Lazy sweep: a cancelled class's refund is a promise dated 24 hours out (see
+  // cancel_session), not an instant ledger row. There's no cron here, so whichever
+  // request next checks the wallet is what actually writes any refund that's come due.
+  await supabase.rpc('process_due_refunds')
+
+  const { data, error } = await supabase
+    .from('account_balances')
+    .select('balance')
+    .eq('owner_id', parentId)
+    .eq('type', 'parent_wallet')
+    .maybeSingle()
+  if (error) throw error
+  return toPaise(data?.balance ?? 0)
 }
 
 /** Every enrollment for a parent, with its money state derived from the ledger. */
@@ -204,6 +271,7 @@ export async function parentEnquiries(parentId: string): Promise<EnquiryRow[]> {
     .select(`
       id, status, message, created_at, responded_at,
       child_id, category_id, parent_id, trainer_id,
+      preferred_weekday, preferred_time,
       children:child_id ( name, dob ),
       categories:category_id ( name ),
       parent:parent_id ( full_name, area_label ),
@@ -242,6 +310,8 @@ export async function parentEnquiries(parentId: string): Promise<EnquiryRow[]> {
       ratePerClass: null,
       enrollmentId: (e?.id as string) ?? null,
       enrollmentStatus: (e?.status as EnquiryRow['enrollmentStatus']) ?? null,
+      preferredWeekday: r.preferred_weekday,
+      preferredTime: r.preferred_time ? (r.preferred_time as string).slice(0, 5) : null,
     }
   })
   /* eslint-enable @typescript-eslint/no-explicit-any */
@@ -278,7 +348,8 @@ export async function trainerDetail(trainerId: string): Promise<TrainerDetail | 
       categories:category_id ( name, slug, group_name )
     `)
     .eq('trainer_id', trainerId)
-    .eq('status', 'approved')
+    // DEMO-ONLY: pending shows alongside approved — see migration 0021.
+    .in('status', ['approved', 'pending'])
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   const p = (data as any).profiles

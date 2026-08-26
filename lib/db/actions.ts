@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { supabaseServer } from '@/lib/supabase/server'
 import { flushNotifications } from '@/lib/notify'
-import { toPaise } from '@/lib/money'
+import { toPaise, toNumeric } from '@/lib/money'
 import { createOrder, verifySignature, publicKeyId } from '@/lib/razorpay'
 import { searchTrainers } from './search'
 import type { SearchResult } from './types'
@@ -118,11 +118,15 @@ export async function runSearch(params: {
 
 export async function sendEnquiry(formData: FormData): Promise<ActionResult> {
   const supabase = await supabaseServer()
+  const weekday = formData.get('preferred_weekday')
+  const time = formData.get('preferred_time')
   const { data, error } = await supabase.rpc('send_enquiry', {
     p_child_id: String(formData.get('child_id')),
     p_trainer_id: String(formData.get('trainer_id')),
     p_category_id: String(formData.get('category_id')),
     p_message: String(formData.get('message') ?? '').trim() || null,
+    p_preferred_weekday: weekday ? Number(weekday) : null,
+    p_preferred_time: time ? String(time) : null,
   })
   if (error) return fail(error)
 
@@ -130,6 +134,96 @@ export async function sendEnquiry(formData: FormData): Promise<ActionResult> {
   revalidatePath('/parent/enquiries')
   revalidatePath('/trainer/enquiries')
   return { ok: true, data: { id: data as string } }
+}
+
+/**
+ * A coach marking a weekly slot busy or free. Toggled, not set — the client always
+ * knows which state it's flipping from, so this is just an insert-or-delete on the one
+ * row that slot would be.
+ */
+export async function toggleBlockedSlot(weekday: number, time: string): Promise<ActionResult> {
+  const supabase = await supabaseServer()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth.user) return { ok: false, error: 'Not signed in' }
+
+  const { data: existing, error: readError } = await supabase
+    .from('trainer_blocked_slots')
+    .select('trainer_id')
+    .eq('trainer_id', auth.user.id)
+    .eq('weekday', weekday)
+    .eq('time', time)
+    .maybeSingle()
+  if (readError) return fail(readError)
+
+  if (existing) {
+    const { error } = await supabase
+      .from('trainer_blocked_slots')
+      .delete()
+      .eq('trainer_id', auth.user.id)
+      .eq('weekday', weekday)
+      .eq('time', time)
+    if (error) return fail(error)
+  } else {
+    const { error } = await supabase
+      .from('trainer_blocked_slots')
+      .insert({ trainer_id: auth.user.id, weekday, time })
+    if (error) return fail(error)
+  }
+
+  revalidatePath('/trainer/categories')
+  return { ok: true }
+}
+
+/**
+ * Books a free slot directly — no enquiry, no waiting on the coach to accept. Returns
+ * a pending_payment enrollment id; the caller sends the parent straight to
+ * /parent/pay/[id], which is the same Razorpay screen the old accept-then-pay path used.
+ */
+export async function bookSlot(formData: FormData): Promise<ActionResult> {
+  const supabase = await supabaseServer()
+
+  let instants: string[] = []
+  try {
+    instants = JSON.parse(String(formData.get('instants') ?? '[]'))
+  } catch {
+    return { ok: false, error: 'Pick at least one class' }
+  }
+  if (!Array.isArray(instants) || instants.length === 0) {
+    return { ok: false, error: 'Pick at least one class' }
+  }
+
+  const { data, error } = await supabase.rpc('book_slots', {
+    p_child_id: String(formData.get('child_id')),
+    p_trainer_id: String(formData.get('trainer_id')),
+    p_category_id: String(formData.get('category_id')),
+    p_timestamps: instants,
+  })
+  if (error) return fail(error)
+
+  revalidatePath('/parent')
+  return { ok: true, data: { enrollmentId: data as string } }
+}
+
+/**
+ * A parent pulling a future class off the calendar. Refunds that one class's share to
+ * their wallet — everything else on the enrollment is untouched. Only works on a
+ * scheduled class that hasn't happened yet; the RPC is the real gate, this is just the
+ * thin wrapper.
+ */
+export async function cancelSession(sessionId: string, reason?: string): Promise<ActionResult> {
+  const supabase = await supabaseServer()
+  const { data, error } = await supabase.rpc('cancel_session', {
+    p_session_id: sessionId,
+    p_reason: reason?.trim() || null,
+  })
+  if (error) return fail(error)
+
+  await flushNotifications()
+  revalidatePath('/parent')
+  revalidatePath('/parent/calendar')
+  revalidatePath('/parent/wallet')
+  revalidatePath('/trainer')
+  return { ok: true, data: { refunded: data as number } }
 }
 
 export async function withdrawEnquiry(enquiryId: string): Promise<ActionResult> {
@@ -245,6 +339,50 @@ export async function verifyAndFundEnrollment(
 }
 
 /**
+ * A wallet top-up, not tied to any enrollment yet — the other half of what
+ * fund_enrollment already does in one step. Same two-part flow as paying for an
+ * enrollment: an order here, a verified charge before topup_wallet is ever called.
+ */
+export async function createWalletTopupOrder(amountRupees: number): Promise<ActionResult> {
+  const supabase = await supabaseServer()
+  const { data: auth } = await supabase.auth.getUser()
+  if (!auth.user) return { ok: false, error: 'Not signed in' }
+
+  if (!Number.isFinite(amountRupees) || amountRupees < 50) {
+    return { ok: false, error: 'Top up at least ₹50' }
+  }
+
+  const keyId = publicKeyId()
+  if (!keyId) return { ok: false, error: 'Razorpay test keys are not configured' }
+
+  const amountPaise = Math.round(amountRupees) * 100
+  try {
+    const order = await createOrder(amountPaise, `topup-${auth.user.id.slice(0, 8)}-${Date.now()}`)
+    return { ok: true, data: { orderId: order.id, amount: order.amount, keyId } }
+  } catch (err) {
+    return fail(err)
+  }
+}
+
+export async function verifyAndTopupWallet(
+  razorpayOrderId: string,
+  razorpayPaymentId: string,
+  razorpaySignature: string,
+  amountPaise: number,
+): Promise<ActionResult> {
+  const valid = verifySignature(razorpayOrderId, razorpayPaymentId, razorpaySignature)
+  if (!valid) return { ok: false, error: 'Payment could not be verified' }
+
+  const supabase = await supabaseServer()
+  const { error } = await supabase.rpc('topup_wallet', { p_amount: toNumeric(amountPaise) })
+  if (error) return fail(error)
+
+  revalidatePath('/parent/wallet')
+  revalidatePath('/parent')
+  return { ok: true }
+}
+
+/**
  * One atomic update. Status and assessment note go together — there is no "mark
  * attended now, write the note later" path, and the trigger rejects the attempt if
  * anyone tries. The money release happens inside this same statement.
@@ -338,6 +476,7 @@ export async function saveTrainerProfile(formData: FormData): Promise<ActionResu
   const lat = Number(formData.get('lat'))
   const lng = Number(formData.get('lng'))
   const areaLabel = String(formData.get('area_label') ?? '').trim() || null
+  const avatarUrl = String(formData.get('avatar_url') ?? '').trim() || null
 
   if (fullName.length < 2) return { ok: false, error: 'Enter your name' }
   if (headline.length < 8) return { ok: false, error: 'Write a headline parents will read first' }
@@ -351,6 +490,7 @@ export async function saveTrainerProfile(formData: FormData): Promise<ActionResu
     full_name: fullName,
     phone: auth.user.phone ? `+${auth.user.phone}` : null,
     area_label: areaLabel,
+    avatar_url: avatarUrl,
   })
   if (pErr) return fail(pErr)
 

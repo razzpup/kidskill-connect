@@ -31,6 +31,15 @@ export function IncomingRequest({ enquiries }: { enquiries: EnquiryRow[] }) {
   const pending = enquiries.filter((e) => !dismissed.has(e.id))
   const current = pending[0]
 
+  // A parent who picked a slot when they enquired gets that slot proposed back, instead
+  // of the trainer guessing today-at-5pm and having to remember to change it.
+  useEffect(() => {
+    if (!current) return
+    if (current.preferredWeekday != null) setWeekday(current.preferredWeekday)
+    if (current.preferredTime) setTime(current.preferredTime)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current?.id])
+
   // Mark anything that shows up after first paint as newly arrived, so a request that
   // lands while the trainer is watching animates in rather than appearing to have been
   // there all along.
@@ -154,6 +163,11 @@ export function IncomingRequest({ enquiries }: { enquiries: EnquiryRow[] }) {
           </div>
 
           <div className="mt-4">
+            {current.preferredWeekday != null && current.preferredTime && (
+              <p className="mb-2 text-[0.75rem] text-muted">
+                Asked for <span className="font-semibold text-ink">{formatSlot(current.preferredWeekday, current.preferredTime)}</span>
+              </p>
+            )}
             <SlotPicker weekday={weekday} time={time} onWeekday={setWeekday} onTime={setTime} />
           </div>
 

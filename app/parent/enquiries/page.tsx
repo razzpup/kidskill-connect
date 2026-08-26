@@ -5,7 +5,7 @@ import { Chip, EmptyState, LinkButton, relativeDay } from '@/components/ui'
 import { LiveSection } from '@/components/LiveSection'
 
 const TONE: Record<string, { tone: 'quiet' | 'grass' | 'outline' | 'alert'; label: string }> = {
-  open: { tone: 'outline', label: 'Waiting on the trainer' },
+  open: { tone: 'outline', label: 'Waiting on the coach' },
   accepted: { tone: 'grass', label: 'Accepted' },
   declined: { tone: 'alert', label: 'Declined' },
   withdrawn: { tone: 'quiet', label: 'Withdrawn' },
@@ -19,15 +19,15 @@ export default async function ParentEnquiriesPage() {
     <LiveSection tables={['enquiries', 'enrollments']}>
       <h1 className="display text-[1.75rem] font-extrabold leading-none">Enquiries</h1>
       <p className="mt-2 text-[0.9375rem] text-muted">
-        You send these. Trainers never approach you.
+        You send these. Coaches never approach you.
       </p>
 
       <div className="mt-6">
         {enquiries.length === 0 ? (
           <EmptyState
             title="No enquiries yet"
-            body="Search for a skill your child wants to learn, open a trainer, and send one. Nothing is charged until a trainer accepts and you choose to pay."
-            action={<LinkButton href="/parent/search">Find a trainer</LinkButton>}
+            body="Search for a skill your child wants to learn, open a coach, and send one. Nothing is charged until a coach accepts and you choose to pay."
+            action={<LinkButton href="/parent/search">Find a coach</LinkButton>}
           />
         ) : (
           <ul className="space-y-2.5">

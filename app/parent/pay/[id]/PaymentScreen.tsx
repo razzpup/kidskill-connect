@@ -44,7 +44,7 @@ export function PaymentScreen({ enrollment }: { enrollment: EnrollmentSummary })
       order_id: orderData.orderId,
       amount: orderData.amount,
       currency: 'INR',
-      name: 'KidSkill Connect',
+      name: 'KidsConnect',
       description: `${enrollment.categoryName} · ${enrollment.classesPerMonth} classes for ${enrollment.childName}`,
       theme: { color: '#2F6F4E' },
       handler: async (response: {

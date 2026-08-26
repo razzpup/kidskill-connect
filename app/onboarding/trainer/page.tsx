@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { supabaseServer } from '@/lib/supabase/server'
 import { listCategories } from '@/lib/db/parent'
-import { hasTrainerProfile } from '@/lib/db/trainer'
+import { trainerOnboardingStep } from '@/lib/db/trainer'
 import { TrainerOnboarding } from './TrainerOnboarding'
 
 /**
@@ -14,7 +14,8 @@ export default async function TrainerOnboardingPage() {
   const { data: auth } = await supabase.auth.getUser()
   if (!auth.user) redirect('/sign-in')
 
-  if (await hasTrainerProfile(auth.user.id)) redirect('/trainer')
+  const step = await trainerOnboardingStep(auth.user.id)
+  if (step === 'done') redirect('/trainer')
 
   const categories = await listCategories()
 
@@ -25,6 +26,7 @@ export default async function TrainerOnboardingPage() {
     <TrainerOnboarding
       categories={categories}
       initialName={(profile?.full_name as string) ?? ''}
+      initialStep={step}
     />
   )
 }

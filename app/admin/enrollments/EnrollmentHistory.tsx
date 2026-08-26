@@ -59,7 +59,7 @@ export function EnrollmentHistory({ services }: { services: ActiveService[] }) {
               <thead>
                 <tr className="border-b border-line">
                   <Th>Child · Parent</Th>
-                  <Th>Trainer</Th>
+                  <Th>Coach</Th>
                   <Th>Category</Th>
                   <Th>Status</Th>
                   <Th>Started</Th>
@@ -183,7 +183,7 @@ function RefundDialog({ service, onClose }: { service: ActiveService; onClose: (
           onChange={(e) => setReason(e.target.value)}
           autoFocus
           className="w-full rounded-xl border border-line bg-[var(--paper)] px-3.5 py-2.5 text-[0.9375rem] outline-none focus:border-grass"
-          placeholder="Trainer unavailable for the rest of the month."
+          placeholder="Coach unavailable for the rest of the month."
         />
 
         <div className="mt-5 flex gap-2">

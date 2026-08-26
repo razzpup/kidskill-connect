@@ -98,12 +98,12 @@ export function ActiveServicesMonitor({
             <thead>
               <tr className="border-b border-line">
                 <Th>Child · Parent</Th>
-                <Th>Trainer</Th>
+                <Th>Coach</Th>
                 <Th>Category</Th>
                 <Th>Area</Th>
                 <Th align="right">Delivered</Th>
                 <Th align="right">In escrow</Th>
-                <Th align="right">To trainer</Th>
+                <Th align="right">To coach</Th>
                 <Th align="right">Platform</Th>
                 <Th>Last marked</Th>
                 <Th>Next class</Th>

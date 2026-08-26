@@ -7,10 +7,10 @@ import { LiveSection } from '@/components/LiveSection'
 const TYPE_LABEL: Record<string, string> = {
   topup: 'Gateway → wallet',
   hold: 'Wallet → escrow',
-  release: 'Escrow → trainer',
+  release: 'Escrow → coach',
   commission: 'Escrow → platform',
   refund: 'Escrow → wallet',
-  payout: 'Trainer → bank',
+  payout: 'Coach → bank',
 }
 
 /**

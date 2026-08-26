@@ -14,11 +14,10 @@ export default async function TrainerLayout({ children }: { children: React.Reac
   return (
     <div className="theme-dark min-h-dvh bg-paper text-ink">
       <DashboardNav
-        title="KidSkill"
+        roleLabel="Coach"
         name={viewer.profile.full_name}
         items={[
-          { href: '/trainer', label: 'Today' },
-          { href: '/trainer/calendar', label: 'Calendar' },
+          { href: '/trainer', label: 'Calendar' },
           { href: '/trainer/enquiries', label: 'Enquiries' },
           { href: '/trainer/earnings', label: 'Earnings' },
           { href: '/trainer/categories', label: 'Categories' },

@@ -29,6 +29,16 @@ Full detail: `docs/spec.md`. Schema of record: `supabase/migrations/0001_init.sq
 5. **Only approved categories are searchable.** A trainer appears in results for a
    category only where `trainer_categories.status = 'approved'`. This is the barrier
    to entry and it is a hard filter in the search RPC, not a UI concern.
+
+   **Suspended for the current demo** (migrations 0021–0022, deliberate and temporary):
+   `pending` categories are searchable and bookable too, so a coach is discoverable the
+   moment they apply rather than after admin reviews them. The admin approvals queue
+   still functions for real — approving still flips the status and the UI still shows
+   the difference (an `ApprovedBadge` vs. an "Application pending" chip) — it just isn't
+   the search/booking gate right now. `rejected` still never surfaces. To restore the
+   real rule: put `status = 'approved'` back in `search_trainers`, `book_slots`,
+   `send_enquiry`, `accept_enquiry`, and `trainerDetail`'s category filter
+   (`lib/db/parent.ts`).
 6. **Commission is split at release**, not at payment. One release produces two ledger
    rows: escrow → trainer (net) and escrow → platform (commission).
 
@@ -112,9 +122,16 @@ The brief is explicit: fast, smooth, simple, and light on forms for the parent s
 
 ## Out of scope — do not build
 
-In-app chat, video calls, public reviews or star ratings, recommendation algorithms,
+In-app chat, public reviews or star ratings, recommendation algorithms,
 trainer-initiated enquiries or any trainer-side feed of children, group classes,
 multi-child bundle pricing, native mobile app, real payment gateway integration. If a task drifts toward any of these, stop and flag it.
+
+Video calling is a deliberate exception: a class's video call is embedded via Jitsi's
+free public server (`components/VideoCall.tsx`), room name derived from the session id
+so both sides land in the same room. No recording, no waiting room, no account — same
+trust model as handing someone a meeting link, just rendered inside the app instead of
+sent to one. Don't build anything beyond that (recording, scheduling integration, a
+dedicated call history) without the same kind of explicit go-ahead.
 
 ## Demo path
 

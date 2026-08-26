@@ -1,59 +1,55 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------ type
-   Fontshare, self-hosted from /public/fonts. No Google Fonts, no CDN.
-   Cabinet Grotesk sets display and headings; Switzer does UI, body and every
-   number. Numbers are tabular everywhere so ledger columns align. */
-
-@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Cabinet Grotesk'; src: url('/fonts/cabinet-grotesk-800.woff2') format('woff2'); font-weight: 800; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-400.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-500.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-600.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Switzer'; src: url('/fonts/switzer-700.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+   KidsConnect visual system, lifted from KidsConnect_Website.html and already
+   proven on /sign-in — now promoted to the whole app. Fonts load via
+   next/font/google in the root layout, which sets these three CSS variables
+   on <html>. Baloo 2 for display/headings, Inter for UI and body, IBM Plex
+   Mono for eyebrow labels — a deliberate, confirmed departure from the
+   Cabinet Grotesk / Switzer / no-monospace-labels system this project
+   started with. Numbers stay tabular everywhere so ledger columns align. */
 
 @theme {
-  --font-display: 'Cabinet Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-sans: 'Switzer', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-raw), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-sans-raw), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-raw), ui-monospace, monospace;
 }
 
 /* ------------------------------------------------------------------ palette
-   Two surfaces, one accent. Marigold is money and nothing else — if it shows up
-   on a non-financial element, that is a bug, not a style choice. */
+   Two surfaces, one visual system. --grass carries every primary action
+   (mapped to KidsConnect coral) and --marigold is reserved for money states
+   only (mapped to KidsConnect yellow) — the token names stay put so the
+   money-only rule keeps being enforced by grep-ability, only the values moved. */
 
 .theme-light {
-  --paper: #F2F4F1;
+  --paper: #FFF9F2;
   --card: #FFFFFF;
-  --ink: #1A2420;
-  --muted: #6B7670;
-  --grass: #2F6F4E;
-  --marigold: #F0B429;
-  --line: #DDE2DC;
+  --ink: #252654;
+  --muted: #6B6E9B;
+  --grass: #FF6F59;
+  --marigold: #FFC857;
+  --line: #E2E1F2;
 
-  --grass-wash: #EAF1EC;
-  --marigold-wash: #FBF1DC;
-  --alert: #B0472F;
-  --alert-wash: #F7E9E5;
-  --shadow: 0 1px 2px rgb(26 36 32 / 0.04), 0 8px 24px -12px rgb(26 36 32 / 0.10);
+  --grass-wash: #FFE8E3;
+  --marigold-wash: #FFF3D6;
+  --alert: #C7402F;
+  --alert-wash: #FBE4E1;
+  --shadow: 0 10px 30px rgba(43, 46, 134, 0.10);
 }
 
 .theme-dark {
-  --paper: #121512;
-  --card: #1C211D;
-  --ink: #E8EDE7;
-  --muted: #8A948C;
-  --grass: #4E9B72;
-  --marigold: #F0B429;
-  --line: #2A312C;
+  --paper: #171A5C;
+  --card: #232674;
+  --ink: #EDEEFB;
+  --muted: #9C9ED9;
+  --grass: #FF8770;
+  --marigold: #FFC857;
+  --line: #34378A;
 
-  --grass-wash: #1B2A22;
-  --marigold-wash: #2C2617;
-  /* One colour beyond the brief, used only for stalled services and rejected
-     applications on the dashboards. Marigold could not do this job without
-     breaking the money-only rule. */
-  --alert: #C2553D;
-  --alert-wash: #2B1A16;
+  --grass-wash: #362A5E;
+  --marigold-wash: #332C55;
+  --alert: #FF7A66;
+  --alert-wash: #3A2A55;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.30), 0 8px 24px -12px rgb(0 0 0 / 0.60);
 }
 
@@ -102,12 +98,13 @@ body {
 
 .display { font-family: var(--font-display); letter-spacing: -0.02em; }
 
-/* Eyebrow labels. Switzer, never monospace — monospace on a label reads as
-   debug output, and this is a product a parent uses in daylight. */
+/* Eyebrow labels in IBM Plex Mono — the KidsConnect signature, carried over
+   from the sign-in page's carnival styling to the whole app. */
 .eyebrow {
+  font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
 }

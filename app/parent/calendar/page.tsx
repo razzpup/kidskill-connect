@@ -4,9 +4,10 @@ import { CalendarGrid, MonthNav } from '@/components/CalendarGrid'
 import { LiveSection } from '@/components/LiveSection'
 
 /**
- * Read-only on purpose. A parent watches the month fill in; they never mark a class,
- * because the whole guarantee of this product is that only the person who taught it can
- * say it happened.
+ * Read-only for attendance, on purpose — a parent never marks a class, because the
+ * whole guarantee of this product is that only the person who taught it can say it
+ * happened. Cancelling a class they haven't taken yet is the one thing they can still
+ * do here.
  */
 export default async function ParentCalendarPage(props: {
   searchParams: Promise<{ y?: string; m?: string }>
@@ -26,6 +27,7 @@ export default async function ParentCalendarPage(props: {
         classes={classes}
         year={year}
         month={month}
+        allowCancel
         emptyHint="No classes this month. Once you fund a month, every class appears here on the day it falls."
       />
     </LiveSection>

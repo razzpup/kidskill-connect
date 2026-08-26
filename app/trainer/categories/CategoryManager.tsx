@@ -88,7 +88,7 @@ export function CategoryManager({ mine, all }: { mine: TrainerCategory[]; all: C
                 id="rate_per_class"
                 name="rate_per_class"
                 type="number"
-                min={1}
+                min={0}
                 step={50}
                 defaultValue={600}
                 required
@@ -191,7 +191,7 @@ function CategoryRow({ category }: { category: TrainerCategory }) {
               <span className="text-muted">₹</span>
               <input
                 type="number"
-                min={1}
+                min={0}
                 step={50}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}

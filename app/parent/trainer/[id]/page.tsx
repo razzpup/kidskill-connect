@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { requireRole } from '@/lib/db/session'
-import { supabaseServer } from '@/lib/supabase/server'
-import { listChildren, myLocation, trainerDetail } from '@/lib/db/parent'
+import { listChildren, myLocation, trainerBusyInstants, trainerDetail } from '@/lib/db/parent'
+import { trainerBlockedSlots } from '@/lib/db/trainer'
 import { distanceToTrainer } from '@/lib/db/search'
-import { ApprovedBadge, Money, PinIcon, ShieldIcon } from '@/components/ui'
+import { ApprovedBadge, Chip, Money, PinIcon, ShieldIcon } from '@/components/ui'
 import { Avatar } from '../../search/SearchScreen'
-import { EnquiryComposer } from './EnquiryComposer'
+import { BookingComposer } from './BookingComposer'
 
 export default async function TrainerProfilePage(props: {
   params: Promise<{ id: string }>
@@ -19,17 +19,19 @@ export default async function TrainerProfilePage(props: {
   const trainer = await trainerDetail(id)
   if (!trainer) notFound()
 
-  const supabase = await supabaseServer()
-  const [loc, children] = await Promise.all([myLocation(), listChildren(userId)])
+  // Current month through two months ahead — a real calendar window, not a weekly template.
+  const now = new Date()
+  const windowFrom = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const windowTo = new Date(now.getFullYear(), now.getMonth() + 3, 1).toISOString()
+
+  const [loc, children, unavailableInstants, blockedWeekly] = await Promise.all([
+    myLocation(),
+    listChildren(userId),
+    trainerBusyInstants(id, windowFrom, windowTo),
+    trainerBlockedSlots(id),
+  ])
 
   const distance = loc ? await distanceToTrainer(loc.lat, loc.lng, id) : null
-
-  const { data: openEnquiries } = await supabase
-    .from('enquiries')
-    .select('id, category_id, child_id, status')
-    .eq('parent_id', userId)
-    .eq('trainer_id', id)
-    .in('status', ['open', 'accepted'])
 
   const selectedCategory =
     trainer.categories.find((c) => c.categoryId === searchParams.category) ?? trainer.categories[0]
@@ -44,7 +46,7 @@ export default async function TrainerProfilePage(props: {
       </Link>
 
       <header className="flex gap-4">
-        <Avatar name={trainer.fullName} size={62} />
+        <Avatar name={trainer.fullName} avatarUrl={trainer.avatarUrl} size={62} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h1 className="display truncate text-[1.5rem] font-extrabold leading-tight">
@@ -66,9 +68,11 @@ export default async function TrainerProfilePage(props: {
         </div>
       </header>
 
-      {/* The vetting is the product's trust argument, so it is shown, not summarised. */}
+      {/* The vetting is the product's trust argument, so it is shown, not summarised —
+          a category still awaiting admin review says so rather than wearing the same
+          checkmark as one that's actually been vetted. */}
       <section className="mt-7">
-        <p className="eyebrow mb-3">Approved to teach</p>
+        <p className="eyebrow mb-3">Teaches</p>
         <ul className="space-y-2">
           {trainer.categories.map((c) => (
             <li
@@ -76,7 +80,11 @@ export default async function TrainerProfilePage(props: {
               className="rounded-2xl border border-line bg-[var(--card)] p-4"
             >
               <div className="flex items-start justify-between gap-3">
-                <ApprovedBadge>{c.categoryName}</ApprovedBadge>
+                {c.status === 'approved' ? (
+                  <ApprovedBadge>{c.categoryName}</ApprovedBadge>
+                ) : (
+                  <Chip tone="outline">{c.categoryName} · Application pending</Chip>
+                )}
                 <div className="text-right">
                   <Money paise={c.ratePerClass} />
                   <p className="eyebrow mt-0.5">per class</p>
@@ -93,7 +101,7 @@ export default async function TrainerProfilePage(props: {
         </ul>
         {trainer.categories.length === 0 && (
           <p className="text-[0.9375rem] text-muted">
-            This trainer has no approved categories yet, so they cannot take enquiries.
+            This coach has no categories yet, so they cannot take enquiries.
           </p>
         )}
       </section>
@@ -114,18 +122,15 @@ export default async function TrainerProfilePage(props: {
       </section>
 
       {selectedCategory && children.length > 0 && (
-        <EnquiryComposer
+        <BookingComposer
           trainerId={trainer.id}
           trainerName={trainer.fullName}
           categories={trainer.categories}
           initialCategoryId={selectedCategory.categoryId}
           childrenList={children}
           initialChildId={searchParams.child ?? children[0].id}
-          existing={(openEnquiries ?? []).map((e) => ({
-            categoryId: e.category_id as string,
-            childId: e.child_id as string,
-            status: e.status as string,
-          }))}
+          unavailableInstants={unavailableInstants}
+          blockedWeekly={blockedWeekly}
         />
       )}
 
@@ -138,7 +143,7 @@ export default async function TrainerProfilePage(props: {
                 href="/parent/children/new"
                 className="flex w-full items-center justify-center rounded-xl bg-grass px-5 text-base font-semibold text-white py-3.5"
               >
-                Add a child to send a request
+                Add a child to book a class
               </Link>
             </div>
           </div>

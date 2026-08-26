@@ -38,8 +38,8 @@ export function ProgressSpine({
     return (
       <EmptyState
         title="The spine starts with the first class"
-        body={`Nothing has been recorded for ${childName} yet. The moment a trainer marks a class attended and writes what happened, it appears here — and stays here.`}
-        action={<LinkButton href="/parent/search">Find a trainer</LinkButton>}
+        body={`Nothing has been recorded for ${childName} yet. The moment a coach marks a class attended and writes what happened, it appears here — and stays here.`}
+        action={<LinkButton href="/parent/search">Find a coach</LinkButton>}
       />
     )
   }

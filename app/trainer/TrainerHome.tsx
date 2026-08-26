@@ -2,19 +2,33 @@
 
 import { useState } from 'react'
 import { EmptyState, Money, ClockIcon, PinIcon, formatTime, relativeDay } from '@/components/ui'
+import { CalendarGrid, MonthNav } from '@/components/CalendarGrid'
 import { useLiveRefresh } from '@/lib/realtime'
 import { commissionOf, type Paise } from '@/lib/money'
+import { VideoCall } from '@/components/VideoCall'
 import type { EnquiryRow, SessionRow } from '@/lib/db/types'
+import type { CalendarClass } from '@/lib/db/calendar'
 import { MarkAttendedSheet } from './MarkAttendedSheet'
 import { IncomingRequest } from './IncomingRequest'
 
-export function TodayScreen({
+/**
+ * One page for the trainer: what needs acting on right now (overdue, then today), the
+ * month to browse or jump into any other day from, and a plain-text rundown of what's
+ * coming next so a class three weeks out doesn't require paging the calendar forward to
+ * notice. Marking a class attended is the only action in the product that moves a
+ * rupee, so every entry point into it — a card here, a calendar square, the coming-up
+ * list — opens the same sheet.
+ */
+export function TrainerHome({
   firstName,
   today,
   overdue,
   upcoming,
   balance,
   openEnquiries,
+  calendarClasses,
+  calendarYear,
+  calendarMonth,
 }: {
   firstName: string
   today: SessionRow[]
@@ -22,11 +36,34 @@ export function TodayScreen({
   upcoming: SessionRow[]
   balance: Paise
   openEnquiries: EnquiryRow[]
+  calendarClasses: CalendarClass[]
+  calendarYear: number
+  calendarMonth: number
 }) {
   const [marking, setMarking] = useState<SessionRow | null>(null)
-  // `enquiries` is here so a parent reaching out interrupts, rather than waiting to
-  // be discovered on another screen.
   useLiveRefresh(['sessions', 'ledger_entries', 'enrollments', 'enquiries'])
+
+  const unmarkedThisMonth = calendarClasses.filter((c) => c.missed).length
+
+  /** The sheet wants a SessionRow; a calendar entry already carries everything it needs. */
+  function toSession(c: CalendarClass): SessionRow {
+    return {
+      id: c.id,
+      enrollmentId: c.enrollmentId,
+      scheduledAt: c.scheduledAt,
+      status: c.status,
+      markedAt: null,
+      assessmentNote: c.assessmentNote,
+      skillRating: c.skillRating,
+      focusAreas: c.focusAreas,
+      childName: c.childName,
+      categoryName: c.categoryName,
+      parentName: c.parentName,
+      parentArea: c.parentArea,
+      ratePerClass: c.ratePerClass,
+      commissionPct: '15.00',
+    }
+  }
 
   return (
     <>
@@ -74,6 +111,28 @@ export function TodayScreen({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="mt-10">
+        <MonthNav year={calendarYear} month={calendarMonth} basePath="/trainer" />
+
+        {unmarkedThisMonth > 0 && (
+          <p
+            className="mb-4 rounded-xl px-3.5 py-2.5 text-[0.8125rem] leading-relaxed"
+            style={{ background: 'var(--alert-wash)', color: 'var(--alert)' }}
+          >
+            <span className="num font-semibold">{unmarkedThisMonth}</span>{' '}
+            {unmarkedThisMonth === 1 ? 'class is' : 'classes are'} still unmarked this month.
+          </p>
+        )}
+
+        <CalendarGrid
+          classes={calendarClasses}
+          year={calendarYear}
+          month={calendarMonth}
+          onPick={(c) => setMarking(toSession(c))}
+          emptyHint="No classes this month. They appear here as parents fund their months."
+        />
       </section>
 
       {upcoming.length > 0 && (
@@ -141,6 +200,9 @@ function ClassCard({
               {session.parentArea ?? '—'}
             </span>
             <span>{session.parentName}</span>
+          </div>
+          <div className="mt-3">
+            <VideoCall sessionId={session.id} />
           </div>
         </div>
 

@@ -8,20 +8,24 @@ import { buttonClass } from '@/components/ui'
 import { IdentityStep } from './IdentityStep'
 import { SignOutButton } from '@/components/SignOutButton'
 import { CredentialUpload } from './CredentialUpload'
+import { AvatarUpload } from './AvatarUpload'
 import type { Category } from '@/lib/db/types'
 
 export function TrainerOnboarding({
   categories,
   initialName,
+  initialStep,
 }: {
   categories: Category[]
   initialName: string
+  initialStep: 'profile' | 'identity' | 'category'
 }) {
   const router = useRouter()
-  const [step, setStep] = useState<'profile' | 'identity' | 'category'>('profile')
+  const [step, setStep] = useState<'profile' | 'identity' | 'category'>(initialStep)
   const [place, setPlace] = useState<Place | null>(null)
   const [radius, setRadius] = useState(10)
   const [credentialPath, setCredentialPath] = useState<string | null>(null)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,6 +40,7 @@ export function TrainerOnboarding({
     form.set('lng', String(place.lng))
     form.set('area_label', place.label)
     form.set('service_radius_km', String(radius))
+    if (avatarUrl) form.set('avatar_url', avatarUrl)
 
     const res = await saveTrainerProfile(form)
     setBusy(false)
@@ -94,6 +99,10 @@ export function TrainerOnboarding({
                 className={INPUT}
                 placeholder="Lakshmi Narayanan"
               />
+            </Field>
+
+            <Field label="Photo">
+              <AvatarUpload url={avatarUrl} fallbackSeed={initialName || 'coach'} onChange={setAvatarUrl} />
             </Field>
 
             <Field label="Headline" htmlFor="headline" hint="The one line shown in search results.">
@@ -185,7 +194,7 @@ export function TrainerOnboarding({
                 id="rate_per_class"
                 name="rate_per_class"
                 type="number"
-                min={1}
+                min={0}
                 step={50}
                 defaultValue={600}
                 required

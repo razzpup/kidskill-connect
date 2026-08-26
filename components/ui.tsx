@@ -108,7 +108,7 @@ export function ApprovedBadge({ children }: { children: React.ReactNode }) {
 /* ------------------------------------------------------------------ buttons */
 
 const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition ' +
+  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition ' +
   'disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.985]'
 
 const BUTTON_SIZES = {
@@ -164,7 +164,7 @@ export function Card({
   as?: 'div' | 'section' | 'article' | 'li'
 }) {
   return (
-    <As className={`rounded-2xl border border-line bg-[var(--card)] ${className}`}>{children}</As>
+    <As className={`rounded-[1.25rem] border border-line bg-[var(--card)] shadow-[var(--shadow)] ${className}`}>{children}</As>
   )
 }
 

@@ -9,10 +9,10 @@
  * lands the same day rather than up to six days later.
  */
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-/** Afternoon and evening, when children are actually free. */
-const TIMES = ['15:00', '16:00', '17:00', '18:00', '19:00']
+/** The full day, hour by hour — a coach may teach any time they've made themselves available for. */
+export const TIMES = Array.from({ length: 24 }, (_, h) => `${String(h).padStart(2, '0')}:00`)
 
 export function todayWeekday(): number {
   return new Date().getDay()

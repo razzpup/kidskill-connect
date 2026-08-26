@@ -43,7 +43,7 @@ export function FeedbackBox({
     <form action={submit} className="mt-8 rounded-2xl border border-line bg-[var(--card)] p-4">
       <p className="text-[0.9375rem] font-semibold">How did this class go?</p>
       <p className="mt-1 text-[0.8125rem] leading-relaxed text-muted">
-        Seen only by the KidSkill team. It is never shown on a trainer&apos;s profile.
+        Seen only by the KidsConnect team. It is never shown on a coach&apos;s profile.
       </p>
 
       <div className="mt-4 flex gap-1.5">

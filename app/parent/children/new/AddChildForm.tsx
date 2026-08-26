@@ -39,7 +39,7 @@ export function AddChildForm() {
         Who else are we tracking?
       </h1>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-        Each child gets their own progress spine — trainers, classes and assessments stay
+        Each child gets their own progress spine — coaches, classes and assessments stay
         separate per kid.
       </p>
 

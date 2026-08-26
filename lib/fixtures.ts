@@ -220,6 +220,24 @@ export const previewUpcoming: SessionRow[] = [
   session('u-3', 'Ishaan', daysAhead(14)),
 ]
 
+const calSession = (
+  id: string, childName: string, scheduledAt: string, day: string,
+  status: 'attended' | 'scheduled', missed: boolean,
+): CalendarClass => ({
+  id, enrollmentId: 'enr-vocal-ishaan', scheduledAt, day, status,
+  childName, categoryName: 'Carnatic vocal', trainerName: 'Lakshmi Narayanan',
+  parentName: 'Vikram Shetty', parentArea: 'Indiranagar',
+  assessmentNote: status === 'attended' ? 'Good breath control today.' : null,
+  skillRating: status === 'attended' ? 4 : null, focusAreas: [], ratePerClass: 80_000, missed,
+})
+
+export const previewTrainerCalendar: CalendarClass[] = [
+  calSession('t-1', 'Ishaan', daysAhead(0), dayKey(0), 'scheduled', false),
+  calSession('t-2', 'Meher', daysAhead(0, 19), dayKey(0), 'scheduled', false),
+  calSession('o-1', 'Rehan', daysAgo(2, 17), dayKey(2), 'scheduled', true),
+  calSession('past-1', 'Ishaan', daysAgo(6), dayKey(6), 'attended', false),
+]
+
 export const previewOpenEnquiries: EnquiryRow[] = [
   {
     id: 'enq-1',
@@ -241,6 +259,8 @@ export const previewOpenEnquiries: EnquiryRow[] = [
     ratePerClass: 80_000,
     enrollmentId: null,
     enrollmentStatus: null,
+    preferredWeekday: null,
+    preferredTime: null,
   },
 ]
 

@@ -13,7 +13,7 @@ export default function PreviewIndex() {
   return (
     <main className="theme-light min-h-dvh bg-paper text-ink">
       <div className="mx-auto w-full max-w-[46rem] px-6 py-14">
-        <p className="eyebrow">KidSkill Connect</p>
+        <p className="eyebrow">KidsConnect</p>
         <h1 className="display mt-3 text-[2.25rem] font-extrabold leading-[1.05]">
           Every screen, no backend
         </h1>
@@ -32,7 +32,7 @@ export default function PreviewIndex() {
           />
           <Card
             href="/preview/trainer"
-            eyebrow="Trainer · dark surface"
+            eyebrow="Coach · dark surface"
             title="Today"
             body="The money screen. Today's classes as large tap targets, unmarked classes flagged, and an incoming request from a parent waiting to be answered."
             icon={<GridIcon className="h-[1.15rem] w-[1.15rem]" />}

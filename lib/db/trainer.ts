@@ -117,6 +117,7 @@ export async function trainerEnquiries(trainerId: string): Promise<EnquiryRow[]>
     .select(`
       id, status, message, created_at, responded_at,
       child_id, category_id, parent_id, trainer_id,
+      preferred_weekday, preferred_time,
       children:child_id ( name, dob ),
       categories:category_id ( name ),
       parent:parent_id ( full_name, area_label ),
@@ -156,6 +157,8 @@ export async function trainerEnquiries(trainerId: string): Promise<EnquiryRow[]>
     ratePerClass: rateByCategory.get(r.category_id) ?? null,
     enrollmentId: null,
     enrollmentStatus: null,
+    preferredWeekday: r.preferred_weekday,
+    preferredTime: r.preferred_time ? (r.preferred_time as string).slice(0, 5) : null,
   }))
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }
@@ -283,6 +286,17 @@ export async function trainerCategories(trainerId: string): Promise<TrainerCateg
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
+/** The weekly slots this coach has explicitly marked as unavailable — see the toggle in AvailabilityEditor. */
+export async function trainerBlockedSlots(trainerId: string): Promise<{ weekday: number; time: string }[]> {
+  const supabase = await supabaseServer()
+  const { data, error } = await supabase
+    .from('trainer_blocked_slots')
+    .select('weekday, time')
+    .eq('trainer_id', trainerId)
+  if (error) throw error
+  return (data ?? []).map((d) => ({ weekday: d.weekday as number, time: (d.time as string).slice(0, 5) }))
+}
+
 export async function hasTrainerProfile(trainerId: string): Promise<boolean> {
   const supabase = await supabaseServer()
   const { count } = await supabase
@@ -290,4 +304,31 @@ export async function hasTrainerProfile(trainerId: string): Promise<boolean> {
     .select('user_id', { count: 'exact', head: true })
     .eq('user_id', trainerId)
   return (count ?? 0) > 0
+}
+
+export type TrainerOnboardingStep = 'profile' | 'identity' | 'category' | 'done'
+
+/**
+ * Which onboarding screen a trainer belongs on. `trainer_profiles` is written at the
+ * end of step one, so its mere existence used to be treated as "onboarding finished" —
+ * that was wrong, and it is what let a trainer get bounced to the dashboard mid-flow
+ * before ever applying to a category. "Done" means an actual category application
+ * exists, which is the only thing that makes a trainer searchable at all.
+ */
+export async function trainerOnboardingStep(trainerId: string): Promise<TrainerOnboardingStep> {
+  const supabase = await supabaseServer()
+
+  const { data: tp } = await supabase
+    .from('trainer_profiles')
+    .select('id_submitted_at')
+    .eq('user_id', trainerId)
+    .maybeSingle()
+  if (!tp) return 'profile'
+  if (!tp.id_submitted_at) return 'identity'
+
+  const { count } = await supabase
+    .from('trainer_categories')
+    .select('id', { count: 'exact', head: true })
+    .eq('trainer_id', trainerId)
+  return (count ?? 0) > 0 ? 'done' : 'category'
 }

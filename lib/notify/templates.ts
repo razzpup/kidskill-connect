@@ -20,6 +20,7 @@ export type TemplateKey =
   | 'category_approved'
   | 'category_rejected'
   | 'enrollment_refunded'
+  | 'session_cancelled'
 
 type Payload = Record<string, unknown>
 
@@ -71,7 +72,7 @@ export const TEMPLATES: Record<TemplateKey, Template> = {
     title: () => 'Enquiry declined',
     body: (p) =>
       `Your ${p.category_name} enquiry was declined${p.reason ? `: ${p.reason}` : '.'} ` +
-      `There are other trainers nearby.`,
+      `There are other coaches nearby.`,
     href: () => '/parent/search',
   },
   payment_confirmed: {
@@ -139,6 +140,14 @@ export const TEMPLATES: Record<TemplateKey, Template> = {
     body: (p) =>
       `${rupees(p.amount)} has been returned to your wallet${p.reason ? `: ${p.reason}` : '.'}`,
     href: () => '/parent',
+  },
+  session_cancelled: {
+    title: () => 'Class cancelled',
+    body: (p) =>
+      `${p.child_name ?? 'A parent'} cancelled the ${p.category_name ?? ''} class ` +
+      `on ${p.scheduled_at ?? 'the calendar'}${p.reason ? `: ${p.reason}` : '.'} ` +
+      `The held amount was refunded to their wallet.`,
+    href: () => '/trainer',
   },
 }
 

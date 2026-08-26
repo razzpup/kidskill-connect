@@ -22,12 +22,18 @@ const INTERESTS = [
   'swimming', 'football', 'cricket', 'chess', 'coding', 'public speaking',
 ]
 
-export function OnboardingFlow({ phone }: { phone: string }) {
+export function OnboardingFlow({
+  phone,
+  initialStep,
+}: {
+  phone: string
+  initialStep: 'you' | 'child'
+}) {
   const [interests, setInterests] = useState<string[]>([])
   const [mode, setMode] = useState<'either' | 'online' | 'in_person'>('either')
   const [age, setAge] = useState('')
   const router = useRouter()
-  const [step, setStep] = useState<'you' | 'child'>('you')
+  const [step, setStep] = useState<'you' | 'child'>(initialStep)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [place, setPlace] = useState<{ lat: number; lng: number; label: string } | null>(null)
@@ -84,7 +90,7 @@ export function OnboardingFlow({ phone }: { phone: string }) {
         <form action={submitYou} className="mt-8">
           <h1 className="display text-[1.75rem] font-extrabold leading-tight">What should we call you?</h1>
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-            Trainers see your name and your area when you send an enquiry. They never see your
+            Coaches see your name and your area when you send an enquiry. They never see your
             address until you share it.
           </p>
 
@@ -114,7 +120,7 @@ export function OnboardingFlow({ phone }: { phone: string }) {
         <form action={submitChild} className="mt-8">
           <h1 className="display text-[1.75rem] font-extrabold leading-tight">Add your first child</h1>
           <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-            You can add more later. Everything a trainer records goes onto this child&apos;s
+            You can add more later. Everything a coach records goes onto this child&apos;s
             progress spine.
           </p>
 
@@ -194,9 +200,9 @@ export function OnboardingFlow({ phone }: { phone: string }) {
           </div>
           <p className="mt-1.5 text-[0.75rem] leading-relaxed text-muted">
             {mode === 'online'
-              ? 'Distance stops mattering — you will see the best trainers, not the nearest.'
+              ? 'Distance stops mattering — you will see the best coaches, not the nearest.'
               : mode === 'in_person'
-                ? 'Only trainers willing to travel to you.'
+                ? 'Only coaches willing to travel to you.'
                 : 'Both, sorted by how close they are.'}
           </p>
 
@@ -215,7 +221,7 @@ export function OnboardingFlow({ phone }: { phone: string }) {
       {step === 'you' && (
         <p className="mt-6 flex items-start gap-2 text-[0.75rem] leading-relaxed text-muted">
           <PinIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          Asked once. Search, distances and trainer matching all reuse this.
+          Asked once. Search, distances and coach matching all reuse this.
         </p>
       )}
     </>

@@ -14,10 +14,13 @@ export interface SearchParams {
 }
 
 /**
- * The only way trainers are found. The RPC hard-filters on
- * `trainer_categories.status = 'approved'` and intersects the parent's radius with the
+ * The only way trainers are found. The RPC intersects the parent's radius with the
  * trainer's own `service_radius_km`, so a trainer who will travel 5 km never surfaces
  * to a parent 12 km away no matter how wide the slider is pushed.
+ *
+ * DEMO-ONLY: the RPC currently surfaces `pending` category applications alongside
+ * `approved` ones (not just `approved`) — see migration 0021 for why and how to revert.
+ * `categoryStatus` comes through so the UI can still tell the difference.
  */
 export async function searchTrainers(params: SearchParams): Promise<SearchResult[]> {
   const supabase = await supabaseServer()
@@ -46,6 +49,7 @@ export async function searchTrainers(params: SearchParams): Promise<SearchResult
     teachesOnline: r.teaches_online,
     teachesInPerson: r.teaches_in_person,
     distanceKm: Number(r.distance_km),
+    categoryStatus: r.category_status,
   }))
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }

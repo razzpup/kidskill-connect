@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { submitIdentity } from '@/lib/db/actions'
 import { buttonClass, ShieldIcon } from '@/components/ui'
 import { checkIdentity, ID_HINTS, ID_LABELS, type IdKind } from '@/lib/identity'
+import { CredentialUpload } from './CredentialUpload'
 
 const KINDS: IdKind[] = ['aadhaar', 'pan', 'passport', 'driving_licence', 'voter_id']
 
@@ -19,7 +20,7 @@ export function IdentityStep({ onDone }: { onDone: () => void }) {
   const [kind, setKind] = useState<IdKind>('aadhaar')
   const [number, setNumber] = useState('')
   const [nameOnId, setNameOnId] = useState('')
-  const [docUrl, setDocUrl] = useState('')
+  const [docPath, setDocPath] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -36,7 +37,7 @@ export function IdentityStep({ onDone }: { onDone: () => void }) {
     // Only this leaves the browser.
     form.set('id_last4', result.last4!)
     form.set('id_name', nameOnId)
-    form.set('id_document_url', docUrl)
+    form.set('id_document_url', docPath ?? '')
     const res = await submitIdentity(form)
     setBusy(false)
     if (!res.ok) return setError(res.error ?? 'Could not submit')
@@ -50,7 +51,7 @@ export function IdentityStep({ onDone }: { onDone: () => void }) {
         Prove who you are
       </h1>
       <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-muted">
-        You will be alone with someone&apos;s child. Every trainer on KidSkill has had a
+        You will be alone with someone&apos;s child. Every coach on KidsConnect has had a
         government ID checked by a person, and parents can see that badge before they
         enquire.
       </p>
@@ -119,23 +120,17 @@ export function IdentityStep({ onDone }: { onDone: () => void }) {
         placeholder="Lakshmi Narayanan"
       />
 
-      <label htmlFor="iddoc" className="eyebrow mb-2 mt-6 block">
-        Link to a photo of it
+      <label className="eyebrow mb-2 mt-6 block">
+        Photo of it
       </label>
-      <input
-        id="iddoc"
-        value={docUrl}
-        onChange={(e) => setDocUrl(e.target.value)}
-        className="w-full rounded-xl border border-line bg-[var(--card)] px-3.5 py-3 text-[0.9375rem] outline-none focus:border-grass"
-        placeholder="/identity/my-aadhaar.jpg"
-      />
+      <CredentialUpload path={docPath} onChange={setDocPath} />
       <p className="mt-1.5 text-[0.75rem] leading-relaxed text-muted">
         This is what the reviewer actually looks at. Without it your application waits.
       </p>
 
       <button
         onClick={() => void submit()}
-        disabled={busy || !check?.ok || nameOnId.trim().length < 2}
+        disabled={busy || !check?.ok || nameOnId.trim().length < 2 || !docPath}
         className={buttonClass('primary', 'lg', 'mt-7 w-full')}
       >
         {busy ? 'Submitting…' : 'Submit for verification'}

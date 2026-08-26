@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { Money, SkillMeter, formatTime } from '@/components/ui'
+import { VideoCall } from '@/components/VideoCall'
+import { CancelClassButton } from '@/components/CancelClassButton'
 import type { CalendarClass } from '@/lib/db/calendar'
 
 /**
@@ -64,6 +66,7 @@ export function CalendarGrid({
   year,
   month,
   onPick,
+  allowCancel,
   emptyHint,
 }: {
   classes: CalendarClass[]
@@ -71,6 +74,8 @@ export function CalendarGrid({
   month: number
   /** Trainer side passes this; without it the grid is read-only. */
   onPick?: (c: CalendarClass) => void
+  /** Parent side passes this — lets a scheduled class be cancelled from here. */
+  allowCancel?: boolean
   emptyHint?: string
 }) {
   const [selected, setSelected] = useState<string | null>(null)
@@ -102,7 +107,10 @@ export function CalendarGrid({
 
         <div className="grid grid-cols-7">
           {days.map((day, i) => {
-            if (!day) {
+            // Only today and what's ahead of it — a class that already happened belongs
+            // on the progress spine (parent) or the overdue list (trainer), not as a
+            // square you can still click into here.
+            if (!day || day < today) {
               return <div key={i} className="min-h-[5rem] border-b border-r border-line last:border-r-0" />
             }
             const items = byDay.get(day) ?? []
@@ -169,7 +177,7 @@ export function CalendarGrid({
           </p>
           <ul className="space-y-2">
             {chosen.map((c) => (
-              <DayEntry key={c.id} klass={c} onPick={onPick} />
+              <DayEntry key={c.id} klass={c} onPick={onPick} allowCancel={allowCancel} />
             ))}
           </ul>
         </div>
@@ -185,9 +193,11 @@ export function CalendarGrid({
 function DayEntry({
   klass,
   onPick,
+  allowCancel,
 }: {
   klass: CalendarClass
   onPick?: (c: CalendarClass) => void
+  allowCancel?: boolean
 }) {
   const s = classState(klass)
   const actionable = onPick && (s === 'scheduled' || s === 'missed')
@@ -225,12 +235,23 @@ function DayEntry({
     </div>
   )
 
+  // A live-video join point (and, for a parent, a way to cancel) — shown for any class
+  // that hasn't happened yet, kept out of the button/link wrapper below so neither ever
+  // ends up nested inside another interactive element.
+  const joinRow = s === 'scheduled' && (
+    <div className="mt-2 flex items-center justify-end gap-2">
+      {allowCancel && <CancelClassButton sessionId={klass.id} />}
+      <VideoCall sessionId={klass.id} />
+    </div>
+  )
+
   if (actionable) {
     return (
       <li>
         <button type="button" onClick={() => onPick(klass)} className="w-full text-left">
           {body}
         </button>
+        {joinRow}
       </li>
     )
   }
@@ -243,7 +264,12 @@ function DayEntry({
       </li>
     )
   }
-  return <li>{body}</li>
+  return (
+    <li>
+      {body}
+      {joinRow}
+    </li>
+  )
 }
 
 function Legend() {

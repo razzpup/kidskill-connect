@@ -10,7 +10,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="theme-dark min-h-dvh bg-paper text-ink">
       <DashboardNav
-        title="KidSkill · Admin"
+        roleLabel="Admin"
         name={viewer.profile.full_name}
         items={[
           { href: '/admin', label: 'Active services' },

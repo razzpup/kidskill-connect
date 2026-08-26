@@ -12,7 +12,8 @@
     "db:stop": "supabase stop",
     "test": "node --test \"lib/**/*.test.ts\"",
     "proxy": "node scripts/demo-proxy.mjs",
-    "tunnel": "ngrok http 3003 --host-header=rewrite"
+    "tunnel": "ngrok http 3003 --host-header=rewrite",
+    "tunnel:sync": "node scripts/sync-ngrok-url.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

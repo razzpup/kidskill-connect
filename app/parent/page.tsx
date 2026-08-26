@@ -15,7 +15,7 @@ export default async function ParentHomePage(props: {
     return (
       <EmptyState
         title="Add a child to begin"
-        body="The progress spine belongs to a child. Add one and every class a trainer records lands here."
+        body="The progress spine belongs to a child. Add one and every class a coach records lands here."
         action={<LinkButton href="/parent/children/new">Add a child</LinkButton>}
       />
     )

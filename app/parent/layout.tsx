@@ -3,6 +3,7 @@ import { requireRole } from '@/lib/db/session'
 import { notificationsFor } from '@/lib/db/parent'
 import { ChatIcon } from '@/components/ui'
 import { SignOutButton } from '@/components/SignOutButton'
+import { Logo } from '@/components/Logo'
 import { ParentNav } from './ParentNav'
 
 /**
@@ -19,15 +20,15 @@ export default async function ParentLayout({ children }: { children: React.React
     <div className="theme-light min-h-dvh bg-paper text-ink">
       <header className="sticky top-0 z-20 border-b border-line bg-[color-mix(in_oklab,var(--paper)_88%,transparent)] backdrop-blur">
         <div className="mx-auto flex w-full max-w-[76rem] items-center gap-6 px-6">
-          <Link href="/parent" className="display shrink-0 py-4 text-[1.0625rem] font-extrabold tracking-tight">
-            KidSkill
+          <Link href="/parent" className="shrink-0 py-4">
+            <Logo height={26} />
           </Link>
 
           <ParentNav
             items={[
               { href: '/parent', label: 'Dashboard', icon: 'spine' },
               { href: '/parent/calendar', label: 'Classes', icon: 'calendar' },
-              { href: '/parent/search', label: 'Find a trainer', icon: 'search' },
+              { href: '/parent/search', label: 'Find a coach', icon: 'search' },
               { href: '/parent/enquiries', label: 'Enquiries', icon: 'chat' },
               { href: '/parent/wallet', label: 'Wallet', icon: 'wallet' },
             ]}

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { currentViewer, homeFor } from '@/lib/db/session'
 import { devSignInEnabled } from '@/lib/db/dev-auth'
 import { SignInFlow } from './SignInFlow'
-import './carnival.css'
+import '../km.css'
 
 /**
  * Two doors. A parent is here to find someone; a trainer is here to be listed. They are

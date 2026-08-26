@@ -2,61 +2,27 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { Baloo_2, Inter, IBM_Plex_Mono } from 'next/font/google'
 import { supabaseBrowser } from '@/lib/supabase/client'
 import { devSignIn } from '@/lib/db/dev-auth'
-
-const baloo = Baloo_2({ subsets: ['latin'], weight: ['600', '700', '800'], variable: '--km-font-display' })
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--km-font-body' })
-const plexMono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['500', '600'], variable: '--km-font-mono' })
+import { Logo } from '@/components/Logo'
+import { ALL_CATEGORIES, GROUP_ORDER, GROUP_META, CATEGORY_EMOJI } from '@/lib/categories'
 
 type Door = 'parent' | 'trainer'
 
-/** Section order for the category groups — the three named in the brief, then the rest. */
-const GROUP_ORDER = ['music', 'dance', 'sports', 'arts', 'life_skills'] as const
+/** Local demo only — see requestCode/verify. Never reachable when devEnabled is false. */
+const DUMMY_OTP = '123456'
 
-const GROUP_META: Record<string, { label: string; emoji: string }> = {
-  music: { label: 'Music', emoji: '🎵' },
-  dance: { label: 'Dance', emoji: '💃' },
-  sports: { label: 'Sports', emoji: '⚽' },
-  arts: { label: 'Arts', emoji: '🎨' },
-  life_skills: { label: 'Life skills', emoji: '♟️' },
+/** The standard four-colour "G" mark. Decorative only — see the note under the button. */
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden style={{ flexShrink: 0 }}>
+      <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.56 2.7-3.87 2.7-6.62Z" />
+      <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.94v2.33A9 9 0 0 0 9 18Z" />
+      <path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.16.28-1.7V4.97H.94A9 9 0 0 0 0 9c0 1.45.35 2.83.94 4.03l3.01-2.33Z" />
+      <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .94 4.97l3.01 2.33C4.66 5.17 6.65 3.58 9 3.58Z" />
+    </svg>
+  )
 }
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  'carnatic-vocal': '🎤',
-  'hindustani-vocal': '🎶',
-  'western-guitar': '🎸',
-  'keyboard-piano': '🎹',
-  bharatanatyam: '💃',
-  'hip-hop-dance': '🕺',
-  swimming: '🏊',
-  football: '⚽',
-  cricket: '🏏',
-  badminton: '🏸',
-  chess: '♟️',
-  sketching: '🎨',
-}
-
-/**
- * Static marketing content, not a live read of the `categories` table — this page
- * renders for logged-out visitors, and grants migration 0003 deliberately gives `anon`
- * nothing. Mirrors the seeded categories in supabase/migrations/0001_init.sql.
- */
-const ALL_CATEGORIES: { slug: string; name: string; group: string }[] = [
-  { slug: 'carnatic-vocal', name: 'Carnatic vocal', group: 'music' },
-  { slug: 'hindustani-vocal', name: 'Hindustani vocal', group: 'music' },
-  { slug: 'western-guitar', name: 'Western guitar', group: 'music' },
-  { slug: 'keyboard-piano', name: 'Keyboard & piano', group: 'music' },
-  { slug: 'bharatanatyam', name: 'Bharatanatyam', group: 'dance' },
-  { slug: 'hip-hop-dance', name: 'Hip-hop dance', group: 'dance' },
-  { slug: 'swimming', name: 'Swimming', group: 'sports' },
-  { slug: 'football', name: 'Football', group: 'sports' },
-  { slug: 'cricket', name: 'Cricket', group: 'sports' },
-  { slug: 'badminton', name: 'Badminton', group: 'sports' },
-  { slug: 'chess', name: 'Chess', group: 'life_skills' },
-  { slug: 'sketching', name: 'Sketching', group: 'arts' },
-]
 
 /**
  * Two doors, because the two sides of this marketplace are not the same product.
@@ -86,7 +52,10 @@ export function SignInFlow({
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [googleNote, setGoogleNote] = useState(false)
   const codeRef = useRef<HTMLInputElement>(null)
+  /** Set once devSignIn prepares a phone number; consumed by verify() on the dummy code. */
+  const devPasswordRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (step === 'code') codeRef.current?.focus()
@@ -125,24 +94,18 @@ export function SignInFlow({
     const supabase = supabaseBrowser()
 
     // Locally there is no SMS provider, so numbers outside [auth.sms.test_otp] cannot
-    // receive a code. The dev path signs them in directly instead of failing.
+    // receive a real code. The dev path still shows the same OTP prompt — a demo should
+    // feel like a real sign-in — but any phone number gets in on the fixed dummy code
+    // (see DUMMY_OTP) instead of Supabase's own SMS-verified one.
     if (devEnabled) {
       const prepared = await devSignIn(to)
+      setBusy(false)
       if (!prepared.ok) {
-        setBusy(false)
         setError(prepared.error ?? 'Could not prepare that number')
         return
       }
-      const { data, error } = await supabase.auth.signInWithPassword({
-        phone: to.replace('+', ''),
-        password: prepared.password!,
-      })
-      setBusy(false)
-      if (error || !data.user) {
-        setError(error?.message ?? 'Could not sign in')
-        return
-      }
-      await land(data.user.id)
+      devPasswordRef.current = prepared.password!
+      setStep('code')
       return
     }
 
@@ -177,6 +140,26 @@ export function SignInFlow({
     setBusy(true)
     setError(null)
     const supabase = supabaseBrowser()
+
+    if (devEnabled && method === 'phone' && devPasswordRef.current) {
+      if (value !== DUMMY_OTP) {
+        setBusy(false)
+        setError('Incorrect code')
+        return
+      }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        phone: phone.replace(/\s/g, '').replace('+', ''),
+        password: devPasswordRef.current,
+      })
+      setBusy(false)
+      if (error || !data.user) {
+        setError(error?.message ?? 'Could not sign in')
+        return
+      }
+      await land(data.user.id)
+      return
+    }
+
     const { data, error } =
       method === 'email'
         ? await supabase.auth.verifyOtp({ email, token: value, type: 'email' })
@@ -193,6 +176,7 @@ export function SignInFlow({
     setDoor(d)
     setStep('phone')
     setError(null)
+    setGoogleNote(false)
   }
 
   const groups = GROUP_ORDER.map((key) => ({
@@ -202,19 +186,16 @@ export function SignInFlow({
   })).filter((g) => g.items.length > 0)
 
   return (
-    <div className={`km-page flex min-h-dvh flex-col ${baloo.variable} ${inter.variable} ${plexMono.variable}`}>
+    <div className="km-page flex min-h-dvh flex-col">
       <header className="km-header">
         <div className="km-header-inner">
-          <span className="km-logo">
-            <span className="km-balloon" aria-hidden>🎈</span>
-            KidSkill<span className="km-dot">Connect</span>
-          </span>
+          <Logo height={28} />
           <div className="km-login-row">
             <button type="button" className="km-btn km-btn-outline-onnavy km-btn-sm" onClick={() => openDoor('parent')}>
               Parent Login
             </button>
             <button type="button" className="km-btn km-btn-secondary km-btn-sm" onClick={() => openDoor('trainer')}>
-              Trainer Login
+              Coach Login
             </button>
           </div>
         </div>
@@ -230,11 +211,11 @@ export function SignInFlow({
                     Bangalore&apos;s kids&apos; skill marketplace
                   </div>
                   <h1 style={{ marginTop: 10 }}>
-                    Find a trusted <span className="km-hl">skill trainer</span> for your kid,
+                    Find a trusted <span className="km-hl">skill coach</span> for your kid,
                     right in your neighbourhood.
                   </h1>
                   <p className="km-lead">
-                    Vetted local trainers for music, dance, sports and more. Pay by the month,
+                    Vetted local coaches for music, dance, sports and more. Pay by the month,
                     held in escrow — released one class at a time, only when a class is
                     actually taught.
                   </p>
@@ -244,21 +225,21 @@ export function SignInFlow({
                     <span className="km-emoji" aria-hidden>🎤</span>
                     <div>
                       <div className="km-lbl">Carnatic vocal</div>
-                      <div className="km-sub">Verified trainers</div>
+                      <div className="km-sub">Verified coaches</div>
                     </div>
                   </div>
                   <div className="km-float-badge" style={{ top: 92, right: 0, transform: 'rotate(5deg)' }}>
                     <span className="km-emoji" aria-hidden>⚽</span>
                     <div>
                       <div className="km-lbl">Football</div>
-                      <div className="km-sub">Verified trainers</div>
+                      <div className="km-sub">Verified coaches</div>
                     </div>
                   </div>
                   <div className="km-float-badge" style={{ top: 192, left: 44, transform: 'rotate(-3deg)' }}>
                     <span className="km-emoji" aria-hidden>💃</span>
                     <div>
                       <div className="km-lbl">Bharatanatyam</div>
-                      <div className="km-sub">Verified trainers</div>
+                      <div className="km-sub">Verified coaches</div>
                     </div>
                   </div>
                 </div>
@@ -274,19 +255,19 @@ export function SignInFlow({
                     <div className="km-choice-emoji" aria-hidden>👨‍👩‍👧</div>
                     <h3>For parents</h3>
                     <p>
-                      Search vetted trainers by skill and distance, and pay by the month — held
+                      Search vetted coaches by skill and distance, and pay by the month — held
                       in escrow, released one class at a time.
                     </p>
                     <span className="km-btn km-btn-primary km-btn-sm">Parent login</span>
                   </button>
                   <button type="button" className="km-choice-card" onClick={() => openDoor('trainer')}>
                     <div className="km-choice-emoji" aria-hidden>🧑‍🏫</div>
-                    <h3>For trainers</h3>
+                    <h3>For coaches</h3>
                     <p>
                       Set your own rate per skill and get paid per verified class, once your
                       category is reviewed and approved.
                     </p>
-                    <span className="km-btn km-btn-secondary km-btn-sm">Trainer login</span>
+                    <span className="km-btn km-btn-secondary km-btn-sm">Coach login</span>
                   </button>
                 </div>
               </div>
@@ -295,7 +276,7 @@ export function SignInFlow({
             <section className="km-section" style={{ paddingTop: 0 }}>
               <h2 className="km-section-title">Explore by category</h2>
               <p className="km-section-sub">
-                Every trainer is vetted in a category before a parent can see them.
+                Every coach is vetted in a category before a parent can see them.
               </p>
               {groups.map((g) => (
                 <div key={g.key} className="km-group">
@@ -326,18 +307,19 @@ export function SignInFlow({
                   setStep('phone')
                   setMethod('phone')
                   setError(null)
+                  setGoogleNote(false)
                 }}
               >
                 ← Back
               </button>
 
-              <p className="km-eyebrow">{door === 'parent' ? 'For parents' : 'For trainers'}</p>
+              <p className="km-eyebrow">{door === 'parent' ? 'For parents' : 'For coaches'}</p>
               <h2 style={{ marginTop: 8, fontSize: '1.625rem' }}>
-                {door === 'parent' ? 'Find a trainer' : 'Teach on KidSkill'}
+                {door === 'parent' ? 'Find a coach' : 'Teach on KidsConnect'}
               </h2>
               <p style={{ color: 'var(--km-muted)', fontSize: 14, marginTop: 8, marginBottom: 22, lineHeight: 1.55 }}>
                 {door === 'parent'
-                  ? 'Your number is how trainers reach you about a class. Nothing else is asked yet.'
+                  ? 'Your number is how coaches reach you about a class. Nothing else is asked yet.'
                   : 'Your number is how parents reach you. Next you set your area, your rate, and the credential for your first category.'}
               </p>
 
@@ -395,8 +377,29 @@ export function SignInFlow({
                     )}
                   </div>
                   <button disabled={busy} className="km-btn km-btn-primary km-btn-block">
-                    {busy ? 'One moment…' : method === 'phone' && devEnabled ? 'Continue' : 'Send code'}
+                    {busy ? 'One moment…' : 'Send code'}
                   </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '18px 0' }}>
+                    <span style={{ flex: 1, height: 1, background: 'var(--km-line)' }} />
+                    <span style={{ fontSize: 12, color: 'var(--km-muted)' }}>or</span>
+                    <span style={{ flex: 1, height: 1, background: 'var(--km-line)' }} />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setGoogleNote(true)}
+                    className="km-btn km-btn-block"
+                    style={{ background: '#fff', color: 'var(--km-ink)', border: '1.5px solid var(--km-line)' }}
+                  >
+                    <GoogleIcon />
+                    Continue with Google
+                  </button>
+                  {googleNote && (
+                    <p style={{ marginTop: 8, fontSize: 12.5, color: 'var(--km-muted)', lineHeight: 1.5 }}>
+                      Google sign-in isn&apos;t connected for this demo — continue with phone or email above.
+                    </p>
+                  )}
                 </form>
               ) : (
                 <form
@@ -456,7 +459,7 @@ export function SignInFlow({
       <footer className="km-footer">
         <div className="km-footer-inner">
           <div>
-            <strong>KidSkill Connect</strong> — vetted local trainers for kids in Bangalore.
+            <strong>KidsConnect</strong> — vetted local coaches for kids in Bangalore.
           </div>
         </div>
       </footer>

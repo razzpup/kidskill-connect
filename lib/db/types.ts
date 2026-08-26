@@ -74,6 +74,7 @@ export interface SearchResult {
   teachesOnline: boolean
   teachesInPerson: boolean
   distanceKm: number
+  categoryStatus: VerificationStatus
 }
 
 export interface TrainerCategory {
@@ -124,6 +125,8 @@ export interface EnquiryRow {
   ratePerClass: Paise | null
   enrollmentId: string | null
   enrollmentStatus: EnrollmentStatus | null
+  preferredWeekday: number | null
+  preferredTime: string | null
 }
 
 export interface EnrollmentSummary {

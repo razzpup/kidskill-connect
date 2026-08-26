@@ -1,9 +1,10 @@
 /* ------------------------------------------------------------------------
-   Scoped, literal styling lifted from KidSkill_Connect_Website_Mockup.html.
-   This is a deliberate, page-scoped departure from the palette and fonts
-   mandated in CLAUDE.md — confirmed with the user. Everything here is
-   namespaced under `.km-*` so it cannot leak into the parent/trainer/admin
-   surfaces, which keep the real design system untouched.
+   Marketing-page-specific layout classes lifted from KidsConnect_Website.html
+   — hero, sticker grid, choice cards, form card. Namespaced under `.km-*`.
+   The colour/type tokens duplicated below now match the site-wide palette in
+   globals.css (the KidsConnect system was promoted from sign-in-only to the
+   whole app), so this file only needs to carry the bespoke layout pieces
+   that don't have an equivalent in the shared component library.
    ------------------------------------------------------------------------ */
 
 .km-page {
@@ -28,12 +29,12 @@
 
   background: var(--km-paper);
   color: var(--km-ink);
-  font-family: var(--km-font-body);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
 .km-page h1, .km-page h2, .km-page h3, .km-page h4 {
-  font-family: var(--km-font-display);
+  font-family: var(--font-display);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -41,7 +42,7 @@
 .km-page button { font-family: inherit; }
 
 .km-eyebrow {
-  font-family: var(--km-font-mono);
+  font-family: var(--font-mono);
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -68,18 +69,21 @@
   max-width: 1140px;
   margin: 0 auto;
 }
-.km-logo {
-  font-family: var(--km-font-display);
-  font-weight: 800;
-  font-size: 20px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.km-login-row { display: flex; gap: 10px; align-items: center; }
+
+.km-nav { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.km-navlink {
+  background: none; border: none; cursor: pointer; font: inherit;
+  font-size: 14px; font-weight: 600; color: #D9DAF3; padding: 6px 2px;
+  text-decoration: none;
 }
-.km-logo .km-balloon { font-size: 22px; transform: rotate(-8deg); display: inline-block; }
-.km-logo .km-dot { color: var(--km-yellow); }
-.km-login-row { display: flex; gap: 10px; }
+.km-navlink:hover { color: #fff; }
+
+/* ---------- subhero (For Parents / For Coaches) ---------- */
+.km-subhero { background: var(--km-navy-tint, #E7E8F7); padding: 44px 20px 40px; }
+.km-subhero-inner { max-width: 1140px; margin: 0 auto; }
+.km-subhero h1 { font-size: 32px; color: var(--km-navy); max-width: 640px; }
+.km-subhero p.km-lead { font-size: 15.5px; color: var(--km-muted); max-width: 560px; margin-top: 10px; line-height: 1.55; }
 
 /* ---------- buttons ---------- */
 .km-btn {
@@ -176,6 +180,61 @@
 .km-sticker:hover { transform: scale(1.05) rotate(0deg); box-shadow: var(--km-shadow); }
 .km-sticker .km-emoji { font-size: 20px; }
 
+/* ---------- vision & mission ---------- */
+.km-vm-section {
+  background: var(--km-navy); color: #fff; border-radius: var(--km-radius);
+  padding: 40px 36px; position: relative; overflow: hidden;
+}
+.km-vm-section::after {
+  content: "🎈"; position: absolute; font-size: 120px; opacity: 0.06;
+  right: -10px; bottom: -30px; transform: rotate(12deg);
+}
+.km-vm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; position: relative; z-index: 1; }
+.km-vm-block .km-eyebrow { color: var(--km-yellow); }
+.km-vm-block h3 { font-size: 20px; color: #fff; margin: 8px 0 8px; }
+.km-vm-block p { font-size: 14px; color: #D3D4F2; line-height: 1.6; margin: 0; }
+.km-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 26px; position: relative; z-index: 1; }
+.km-pillar-card { background: rgba(255,255,255,0.07); border-radius: var(--km-radius-sm); padding: 16px; border: 1px solid rgba(255,255,255,0.1); }
+.km-pillar-tag { font-size: 11px; font-weight: 700; color: var(--km-yellow); text-transform: uppercase; letter-spacing: 0.04em; }
+.km-pillar-card p { font-size: 13px; color: #D3D4F2; margin: 6px 0 0; line-height: 1.5; }
+@media (max-width: 900px) { .km-vm-grid, .km-pillars { grid-template-columns: 1fr; } }
+
+/* ---------- why-grid ---------- */
+.km-why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+.km-why-card { background: var(--km-card); border-radius: var(--km-radius); padding: 20px; box-shadow: var(--km-shadow-sm); }
+.km-why-card .km-emoji { font-size: 26px; margin-bottom: 8px; }
+.km-why-card h4 { font-size: 15px; margin-bottom: 6px; }
+.km-why-card p { font-size: 13px; color: var(--km-muted); line-height: 1.5; margin: 0; }
+@media (max-width: 900px) { .km-why-grid { grid-template-columns: 1fr; } }
+
+/* ---------- category grid (big rotated sticker cards) ---------- */
+.km-category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.km-category-card {
+  background: var(--km-card); border-radius: var(--km-radius); padding: 26px 12px; text-align: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; cursor: pointer; border: none;
+  box-shadow: var(--km-shadow-sm); text-decoration: none; color: inherit; display: block;
+  position: relative;
+}
+.km-category-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  border: 2px dashed rgba(43, 46, 134, 0.14); pointer-events: none;
+}
+.km-category-card:nth-child(odd) { transform: rotate(-1.4deg); }
+.km-category-card:nth-child(even) { transform: rotate(1.4deg); }
+.km-category-card:hover { transform: scale(1.05) rotate(0deg); box-shadow: var(--km-shadow); }
+.km-category-emoji { font-size: 36px; margin-bottom: 8px; }
+.km-category-name { font-weight: 700; font-size: 14.5px; font-family: var(--font-display); }
+@media (max-width: 900px) { .km-category-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .km-category-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------- feature table ---------- */
+.km-feature-table-wrap { background: var(--km-card); border-radius: var(--km-radius); box-shadow: var(--km-shadow-sm); overflow: hidden; overflow-x: auto; }
+.km-feature-table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.km-feature-table-wrap th { background: var(--km-navy-tint); color: var(--km-navy); padding: 12px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+.km-feature-table-wrap td { padding: 13px 14px; vertical-align: top; border-bottom: 1px solid #EEE; }
+.km-feature-table-wrap tr:last-child td { border-bottom: none; }
+.km-feature-table-wrap td.km-fname { font-weight: 700; font-family: var(--font-display); font-size: 14px; color: var(--km-ink); }
+
 /* ---------- choice cards (the two doors) ---------- */
 /* Centered as its own moment on the page, not one section among several — the two
    cards are equal height and their buttons line up on the same baseline regardless of
@@ -219,6 +278,19 @@
   cursor: pointer; padding: 4px 0; margin-bottom: 8px;
 }
 .km-back:hover { color: var(--km-ink); }
+
+/* ---------- gold tier / loyalty ---------- */
+.km-gold-banner {
+  background: linear-gradient(120deg, var(--km-yellow-tint) 0%, var(--km-coral-tint) 100%);
+  border-radius: var(--km-radius); padding: 32px; border: 1.5px dashed var(--km-yellow-dark);
+}
+.km-gold-banner .km-eyebrow { color: #8A6112; }
+.km-gold-perks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+.km-gold-perk { background: #fff; border-radius: var(--km-radius-sm); padding: 16px; }
+.km-gold-perk .km-emoji { font-size: 22px; }
+.km-gold-perk h4 { font-size: 13.5px; margin: 6px 0 4px; }
+.km-gold-perk p { font-size: 12px; color: var(--km-muted); margin: 0; line-height: 1.45; }
+@media (max-width: 900px) { .km-gold-perks { grid-template-columns: 1fr; } }
 
 /* ---------- footer ---------- */
 .km-footer { background: var(--km-navy-dark); color: #B7BADE; padding: 30px 20px; font-size: 12.5px; }

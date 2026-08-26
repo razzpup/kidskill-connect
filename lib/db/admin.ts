@@ -53,6 +53,8 @@ export async function pendingApplications(): Promise<
     idLast4: string | null
     idName: string | null
     idDocumentUrl: string | null
+    /** A short-lived link to open the uploaded ID photo, or null if nothing was attached. */
+    idDocumentSignedUrl: string | null
     idSubmittedAt: string | null
     idRejectReason: string | null
     /** A short-lived link to open the uploaded file, or null if nothing was attached. */
@@ -76,17 +78,20 @@ export async function pendingApplications(): Promise<
     .order('created_at')
   if (error) throw error
 
-  // credential_url is a storage object path (`{trainer_id}/...`), not a public link — the
-  // bucket is private (migration 0010), so the only way to open the file is a signed URL
-  // generated with the admin's own session, which is what storage RLS actually checks.
-  const paths = (data ?? [])
-    .map((c: { credential_url: string | null }) => c.credential_url)
-    .filter((p: string | null): p is string => Boolean(p))
+  // credential_url and id_document_url are both storage object paths (`{trainer_id}/...`)
+  // in the same private `credentials` bucket (migrations 0008 and 0010) — the only way to
+  // open either is a signed URL generated with the admin's own session, which is what
+  // storage RLS actually checks.
+  const paths = new Set<string>()
+  for (const c of (data ?? []) as { credential_url: string | null; trainer?: { id_document_url?: string | null } }[]) {
+    if (c.credential_url) paths.add(c.credential_url)
+    if (c.trainer?.id_document_url) paths.add(c.trainer.id_document_url)
+  }
   const signedByPath = new Map<string, string>()
-  if (paths.length > 0) {
+  if (paths.size > 0) {
     const { data: signed } = await supabase.storage
       .from('credentials')
-      .createSignedUrls(paths, 60 * 10)
+      .createSignedUrls([...paths], 60 * 10)
     for (const s of signed ?? []) {
       if (s.signedUrl && !s.error) signedByPath.set(s.path ?? '', s.signedUrl)
     }
@@ -116,6 +121,9 @@ export async function pendingApplications(): Promise<
     idLast4: c.trainer?.id_last4 ?? null,
     idName: c.trainer?.id_name ?? null,
     idDocumentUrl: c.trainer?.id_document_url ?? null,
+    idDocumentSignedUrl: c.trainer?.id_document_url
+      ? (signedByPath.get(c.trainer.id_document_url) ?? null)
+      : null,
     idSubmittedAt: c.trainer?.id_submitted_at ?? null,
     idRejectReason: c.trainer?.id_reject_reason ?? null,
   }))

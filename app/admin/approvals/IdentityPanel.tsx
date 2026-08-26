@@ -27,6 +27,7 @@ export interface IdentityFields {
   idLast4: string | null
   idName: string | null
   idDocumentUrl: string | null
+  idDocumentSignedUrl: string | null
   idSubmittedAt: string | null
 }
 
@@ -68,7 +69,7 @@ export function IdentityPanel({ application: a }: { application: IdentityFields 
           No identity document submitted
         </p>
         <p className="mt-1 text-[0.8125rem] leading-relaxed text-muted">
-          This trainer cannot be approved to teach until they submit one. Nothing to review
+          This coach cannot be approved to teach until they submit one. Nothing to review
           yet.
         </p>
       </div>
@@ -101,8 +102,15 @@ export function IdentityPanel({ application: a }: { application: IdentityFields 
 
       <p className="mt-3 text-[0.8125rem] text-muted">
         Document:{' '}
-        {a.idDocumentUrl ? (
-          <span className="text-grass">{a.idDocumentUrl}</span>
+        {a.idDocumentSignedUrl ? (
+          <a
+            href={a.idDocumentSignedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-grass underline underline-offset-2"
+          >
+            Open file
+          </a>
         ) : (
           <span style={{ color: 'var(--alert)' }}>none attached</span>
         )}
@@ -115,7 +123,7 @@ export function IdentityPanel({ application: a }: { application: IdentityFields 
       {rejecting ? (
         <div className="mt-4">
           <label htmlFor={`idr-${a.trainerId}`} className="eyebrow mb-2 block">
-            Why — the trainer sees this
+            Why — the coach sees this
           </label>
           <input
             id={`idr-${a.trainerId}`}

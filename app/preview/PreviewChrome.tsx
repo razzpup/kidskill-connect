@@ -13,7 +13,7 @@ export function PreviewChrome({
 }) {
   const tabs = [
     { href: '/preview/parent', label: 'Parent' },
-    { href: '/preview/trainer', label: 'Trainer' },
+    { href: '/preview/trainer', label: 'Coach' },
     { href: '/preview/admin', label: 'Admin' },
   ]
 

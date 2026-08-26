@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { runSearch, saveParentLocation } from '@/lib/db/actions'
 import { LocationCapture, type Place } from '@/components/LocationCapture'
 import { Money, PinIcon, ShieldIcon } from '@/components/ui'
+import { CartoonAvatar } from '@/components/CartoonAvatar'
 import type { Category, Child, SearchResult } from '@/lib/db/types'
 
 export function SearchScreen({
@@ -61,7 +62,7 @@ export function SearchScreen({
       <div>
         <h1 className="display text-[1.75rem] font-extrabold">Where are you?</h1>
         <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-          Trainers are matched by distance, both ways — you only see people who are willing to
+          Coaches are matched by distance, both ways — you only see people who are willing to
           travel to you.
         </p>
         <div className="mt-6">
@@ -76,7 +77,7 @@ export function SearchScreen({
   return (
     <>
       <header className="flex items-baseline justify-between gap-3">
-        <h1 className="display text-[1.75rem] font-extrabold leading-none">Find a trainer</h1>
+        <h1 className="display text-[1.75rem] font-extrabold leading-none">Find a coach</h1>
         <button
           type="button"
           onClick={() => setPoint(null)}
@@ -138,7 +139,7 @@ export function SearchScreen({
         {mode === 'online' ? (
           <p className="mt-3 text-[0.8125rem] leading-relaxed text-muted">
             Distance doesn&apos;t apply to an online class — showing the most experienced
-            trainers instead of the nearest.
+            coaches instead of the nearest.
           </p>
         ) : (
         <div className="mt-3 flex items-center gap-3">
@@ -167,7 +168,7 @@ export function SearchScreen({
           <div className="rounded-2xl border border-dashed border-line px-6 py-12 text-center">
             <p className="display text-[1.0625rem] font-bold">Nobody within {radius} km yet</p>
             <p className="mx-auto mt-2 max-w-[36ch] text-[0.9375rem] leading-relaxed text-muted">
-              Widen the distance, or clear the category. Trainers also set their own travel
+              Widen the distance, or clear the category. Coaches also set their own travel
               limit, so some nearby ones won&apos;t come this far.
             </p>
           </div>
@@ -175,7 +176,7 @@ export function SearchScreen({
           <>
             <p className="mb-3 text-[0.8125rem] text-muted">
               <span className="num font-semibold text-ink">{results.length}</span>{' '}
-              {results.length === 1 ? 'trainer' : 'trainers'} · nearest first
+              {results.length === 1 ? 'coach' : 'coaches'} · nearest first
             </p>
             <ul className="space-y-2.5">
               {results.map((r) => (
@@ -227,7 +228,7 @@ function ResultCard({ result, childId }: { result: SearchResult; childId?: strin
       href={href}
       className="flex gap-3.5 rounded-2xl border border-line bg-[var(--card)] p-3.5 transition hover:border-[var(--muted)]"
     >
-      <Avatar name={result.fullName} />
+      <Avatar name={result.fullName} avatarUrl={result.avatarUrl} />
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
@@ -272,20 +273,27 @@ function ResultCard({ result, childId }: { result: SearchResult; childId?: strin
   )
 }
 
-export function Avatar({ name, size = 44 }: { name: string; size?: number }) {
-  const initials = name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
-  return (
-    <span
-      aria-hidden
-      className="grid shrink-0 place-items-center rounded-full bg-grass-wash font-semibold text-grass"
-      style={{ width: size, height: size, fontSize: size * 0.34 }}
-    >
-      {initials}
-    </span>
-  )
+export function Avatar({
+  name,
+  avatarUrl,
+  size = 44,
+}: {
+  name: string
+  avatarUrl?: string | null
+  size?: number
+}) {
+  if (avatarUrl) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return (
+      <img
+        src={avatarUrl}
+        alt=""
+        width={size}
+        height={size}
+        className="shrink-0 rounded-full object-cover"
+        style={{ width: size, height: size }}
+      />
+    )
+  }
+  return <CartoonAvatar seed={name} size={size} />
 }

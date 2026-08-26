@@ -1,11 +1,15 @@
 import { requireRole } from '@/lib/db/session'
-import { parentEnrollments, walletStrip } from '@/lib/db/parent'
+import { parentEnrollments, parentWalletBalance, walletStrip } from '@/lib/db/parent'
 import { Money, EmptyState, LinkButton, relativeDay } from '@/components/ui'
 import { LiveSection } from '@/components/LiveSection'
+import { TopUpWallet } from './TopUpWallet'
 
 export default async function WalletPage() {
   const { userId } = await requireRole('parent')
-  const enrollments = await parentEnrollments(userId)
+  const [enrollments, walletBalance] = await Promise.all([
+    parentEnrollments(userId),
+    parentWalletBalance(userId),
+  ])
   const strip = walletStrip(enrollments)
 
   const active = enrollments.filter((e) => e.status === 'active')
@@ -15,11 +19,15 @@ export default async function WalletPage() {
     <LiveSection tables={['ledger_entries', 'enrollments']}>
       <h1 className="display text-[1.75rem] font-extrabold leading-none">Wallet</h1>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-        Every rupee here is either held for a class that hasn&apos;t happened yet, or already
-        released to the person who taught it.
+        Every rupee here is either sitting in your wallet unspent, held for a class that
+        hasn&apos;t happened yet, or already released to the person who taught it.
       </p>
 
       <div className="mt-6 flex divide-x divide-[var(--line)] overflow-hidden rounded-2xl border border-line bg-[var(--card)]">
+        <div className="flex-1 px-4 py-4">
+          <p className="eyebrow mb-1.5">Wallet balance</p>
+          <Money paise={walletBalance} size="xl" />
+        </div>
         <div className="flex-1 px-4 py-4">
           <p className="eyebrow mb-1.5">Held in escrow</p>
           <Money paise={strip.heldInEscrow} size="xl" />
@@ -30,12 +38,34 @@ export default async function WalletPage() {
         </div>
       </div>
 
+      <div className="mt-6">
+        <TopUpWallet />
+      </div>
+
+      {/* Display only — there is no in-house teaching product behind this yet. */}
+      <div
+        className="mt-6 rounded-2xl border border-dashed p-5"
+        style={{ borderColor: '#F0AE2E', background: 'linear-gradient(120deg, #FFF3D6 0%, #FFE8E3 100%)' }}
+      >
+        <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8A6112' }}>
+          Discovery offer · Coming soon
+        </p>
+        <h3 className="display mt-2 text-[1.0625rem] font-bold leading-tight" style={{ color: '#252654' }}>
+          2 classes for ₹1,000
+        </h3>
+        <p className="mt-1.5 max-w-[46ch] text-[0.8125rem] leading-relaxed" style={{ color: '#6B6E9B' }}>
+          A flat-rate trial, taught by KidsConnect&apos;s own in-house trainers rather than
+          a registered coach — a low-risk way to try a skill before committing to a
+          monthly plan with someone specific.
+        </p>
+      </div>
+
       {active.length === 0 ? (
         <div className="mt-6">
           <EmptyState
             title="Nothing running yet"
             body="Once you pay for a month, it appears here — and you can watch it move from held to released, one class at a time."
-            action={<LinkButton href="/parent/search">Find a trainer</LinkButton>}
+            action={<LinkButton href="/parent/search">Find a coach</LinkButton>}
           />
         </div>
       ) : (
@@ -120,7 +150,7 @@ function MoneyBar({
         <span style={{ width: `${pct(escrow)}%`, background: 'var(--marigold)' }} />
       </div>
       <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[0.75rem]">
-        <Legend color="var(--grass)" label="To trainer" value={released} />
+        <Legend color="var(--grass)" label="To coach" value={released} />
         <Legend color="var(--muted)" label="Platform" value={platform} />
         <Legend color="var(--marigold)" label="Still held" value={escrow} />
       </div>

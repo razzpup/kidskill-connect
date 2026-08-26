@@ -175,6 +175,7 @@ export function ParentHome({
           classes={calendarClasses}
           year={calendarYear}
           month={calendarMonth}
+          allowCancel
           emptyHint="No classes this month. Once you fund a month, every class appears here on the day it falls."
         />
       </section>
@@ -195,7 +196,7 @@ export function ParentHome({
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <p className="eyebrow mb-1">Something new</p>
-            <h2 className="display text-[1.5rem] font-bold leading-none">Discover trainers</h2>
+            <h2 className="display text-[1.5rem] font-bold leading-none">Discover coaches</h2>
           </div>
           <Link
             href="/parent/search"
@@ -217,6 +218,57 @@ export function ParentHome({
               <p className="display mt-3.5 text-[1.125rem] font-bold leading-none">{d.label}</p>
               <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted">{d.body}</p>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Promotional — display only, nothing here is wired to real discounts or billing. */}
+      <section className="mt-14">
+        <p className="eyebrow mb-4">Offers for you</p>
+        <div
+          className="rounded-2xl border border-dashed p-6"
+          style={{ borderColor: '#F0AE2E', background: 'linear-gradient(120deg, #FFF3D6 0%, #FFE8E3 100%)' }}
+        >
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.1em]" style={{ color: '#8A6112' }}>
+            KidsConnect Specialised · Coming soon
+          </p>
+          <h3 className="display mt-2 text-[1.25rem] font-bold leading-tight" style={{ color: '#252654' }}>
+            6 months, one fixed price, taught by our own instructors
+          </h3>
+          <p className="mt-2 max-w-[46ch] text-[0.875rem] leading-relaxed" style={{ color: '#6B6E9B' }}>
+            A membership track separate from the coach marketplace — a fixed 6-month fee
+            unlocks a set curriculum run directly by KidsConnect, not an individual coach.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              ['🥇', 'Priority slots', 'First pick of seats when a new curriculum opens.'],
+              ['💸', 'One flat price', 'No per-class holds — the whole 6 months is settled upfront.'],
+              ['🎟️', 'Member perks', 'Occasional passes for families on the program.'],
+            ].map(([emoji, title, body]) => (
+              <div key={title} className="rounded-xl bg-white p-3.5">
+                <div className="text-[1.375rem] leading-none">{emoji}</div>
+                <p className="mt-2 text-[0.8125rem] font-semibold" style={{ color: '#252654' }}>{title}</p>
+                <p className="mt-1 text-[0.75rem] leading-relaxed" style={{ color: '#6B6E9B' }}>{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          {[
+            ['WELCOME200', '₹200 off your first month'],
+            ['REFER10', '10% off when a friend you refer signs up'],
+          ].map(([code, desc]) => (
+            <span
+              key={code}
+              className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5"
+              style={{ borderColor: '#F0AE2E', background: '#FFF3D6' }}
+            >
+              <span className="num text-[0.8125rem] font-bold tracking-wide" style={{ color: '#8A6112' }}>
+                {code}
+              </span>
+              <span className="text-[0.75rem] text-muted">{desc}</span>
+            </span>
           ))}
         </div>
       </section>

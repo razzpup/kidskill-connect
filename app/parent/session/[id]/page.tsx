@@ -60,7 +60,7 @@ export default async function SessionPage(props: { params: Promise<{ id: string 
       </header>
 
       <div className="mt-6 flex items-center gap-3 rounded-2xl border border-line bg-[var(--card)] p-3.5">
-        <Avatar name={e?.trainer?.full_name ?? '—'} size={40} />
+        <Avatar name={e?.trainer?.full_name ?? '—'} avatarUrl={e?.trainer?.avatar_url ?? null} size={40} />
         <div className="min-w-0 flex-1">
           <p className="text-[0.9375rem] font-semibold">{e?.trainer?.full_name}</p>
           <p className="text-[0.8125rem] text-muted">{e?.trainer?.area_label}</p>

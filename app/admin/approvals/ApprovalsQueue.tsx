@@ -18,6 +18,7 @@ type Application = TrainerCategory & {
   idLast4: string | null
   idName: string | null
   idDocumentUrl: string | null
+  idDocumentSignedUrl: string | null
   idSubmittedAt: string | null
   idRejectReason: string | null
   credentialSignedUrl: string | null
@@ -43,7 +44,7 @@ export function ApprovalsQueue({ applications }: { applications: Application[] }
         {applications.length === 0 ? (
           <EmptyState
             title="Queue is clear"
-            body="Every category application has been reviewed. New ones land here the moment a trainer submits."
+            body="Every category application has been reviewed. New ones land here the moment a coach submits."
           />
         ) : (
           <ul className="space-y-3">
@@ -130,7 +131,7 @@ function ApplicationCard({ application: a }: { application: Application }) {
       {rejecting ? (
         <div className="mt-4">
           <label htmlFor={`why-${a.id}`} className="eyebrow mb-2 block">
-            Why — the trainer sees this
+            Why — the coach sees this
           </label>
           <input
             id={`why-${a.id}`}
